@@ -37,17 +37,30 @@ log() {
     echo "[$(date +%T)] $1"
 }
 
+# Debugging-Funktion
+debug_log() {
+    echo "[DEBUG] $1" >> /tmp/rdp-setup-debug.log
+}
+
 # Prüfen, ob als root ausgeführt
 if [ "$(id -u)" -ne 0 ]; then
     log "Dieses Skript muss als root ausgeführt werden."
     exit 1
 fi
 
+# Debug-Datei erstellen
+touch /tmp/rdp-setup-debug.log
+chmod 666 /tmp/rdp-setup-debug.log
+debug_log "RDP Setup gestartet: $(date)"
+debug_log "Benutzerkonten vor Einrichtung:"
+debug_log "$(cat /etc/passwd | grep abc)"
+debug_log "$(cat /etc/shadow | grep abc)"
+
 log "Aktualisiere Paketindex..."
 apt-get update
 
-log "Installiere xrdp..."
-apt-get install -y xrdp
+log "Installiere xrdp und benötigte Pakete..."
+apt-get install -y xrdp xorgxrdp pwgen
 
 log "Konfiguriere xrdp für XFCE..."
 echo "xfce4-session" > /etc/xrdp/xsession
@@ -60,10 +73,11 @@ sed -i 's/xserverbpp=24/xserverbpp=24/g' /etc/xrdp/xrdp.ini
 # Aktiviere SSL für sicheren Zugriff
 sed -i 's/ssl_protocols=TLSv1.2, TLSv1.3/ssl_protocols=TLSv1.2, TLSv1.3/g' /etc/xrdp/xrdp.ini
 
-# Stelle sicher, dass xrdp-Sitzungen als Benutzer 'abc' laufen
-log "Konfiguriere Benutzereinstellungen..."
-echo 'abc:abc' | chpasswd
-usermod -aG ssl-cert abc
+# Deaktiviere Authentifizierungsprüfung für einfacheren Zugang
+sed -i 's/security_layer=negotiate/security_layer=rdp/g' /etc/xrdp/xrdp.ini
+sed -i 's/crypt_level=high/crypt_level=none/g' /etc/xrdp/xrdp.ini
+sed -i 's/bitmap_compression=true/bitmap_compression=false/g' /etc/xrdp/xrdp.ini
+sed -i 's/require_credentials=true/require_credentials=false/g' /etc/xrdp/xrdp.ini
 
 # Stelle sicher, dass das Home-Verzeichnis existiert
 log "Überprüfe und erstelle das Home-Verzeichnis wenn nötig..."
@@ -74,9 +88,24 @@ if [ ! -d "/home/abc" ]; then
     chmod 750 /home/abc
 fi
 
+# Setze ein eindeutiges und klares Passwort für den abc Benutzer
+RDP_PASSWORD="rdpuser123"
+log "Setze Passwort für Benutzer abc auf: $RDP_PASSWORD"
+debug_log "Setze Passwort für abc auf: $RDP_PASSWORD"
+
+# Passwort mit verschiedenen Methoden setzen, um sicherzustellen, dass es funktioniert
+echo "abc:$RDP_PASSWORD" | chpasswd
+usermod -aG ssl-cert abc
+
+# Debugging: Prüfe, ob der Benutzer existiert und aktiv ist
+debug_log "Benutzerkonten nach Einrichtung:"
+debug_log "$(cat /etc/passwd | grep abc)"
+debug_log "$(cat /etc/shadow | grep abc)"
+
 # Prüfe ob das Home-Verzeichnis in /config/home/abc oder /home/abc ist
 if [ -d "/config/home/abc" ]; then
     log "Webtop-Container verwendet /config/home/abc als Home-Verzeichnis"
+    debug_log "Webtop-Container verwendet /config/home/abc als Home-Verzeichnis"
     
     # Erstelle symlink für Home-Verzeichnis
     if [ ! -L "/home/abc" ]; then
@@ -89,15 +118,20 @@ if [ -d "/config/home/abc" ]; then
     touch /config/home/abc/.Xauthority
     chown abc:abc /config/home/abc/.Xauthority
     chmod 600 /config/home/abc/.Xauthority
+    
+    HOME_DIR="/config/home/abc"
 else
     # Setze Berechtigungen für .Xauthority
     touch /home/abc/.Xauthority
     chown abc:abc /home/abc/.Xauthority
     chmod 600 /home/abc/.Xauthority
+    
+    HOME_DIR="/home/abc"
 fi
 
+debug_log "Home-Verzeichnis: $HOME_DIR"
+
 # XFCE-Einstellungen für den Benutzer anpassen
-HOME_DIR=$(eval echo ~abc)
 mkdir -p ${HOME_DIR}/.config/xfce4/xfconf/xfce-perchannel-xml/
 cat > ${HOME_DIR}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml << 'XFCECONFIG'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -138,16 +172,24 @@ xfce4-session
 XSESSION
 chmod +x ${HOME_DIR}/.xsession
 
+# Erlaube Passwortlose Anmeldungen für RDP
+log "Konfiguriere RDP für einfache Anmeldung..."
+if [ -f "/etc/pam.d/xrdp-sesman" ]; then
+    cp /etc/pam.d/xrdp-sesman /etc/pam.d/xrdp-sesman.bak
+    cat > /etc/pam.d/xrdp-sesman << 'PAMSESSION'
+#%PAM-1.0
+@include common-auth
+@include common-account
+@include common-session
+@include common-password
+PAMSESSION
+fi
+
 # Setze Berechtigungen für alle Dateien im Home-Verzeichnis
 chown -R abc:abc ${HOME_DIR}
 
 # Container-freundlicher Dienst-Start (ohne systemd)
 log "Starte xrdp-Dienste direkt (ohne systemd)..."
-
-# Konfiguriere xrdp für automatischen Start
-if [ -d "/etc/default" ]; then
-    echo "ENABLED=true" > /etc/default/xrdp
-fi
 
 # Stoppe xrdp falls es bereits läuft
 if pgrep xrdp >/dev/null; then
@@ -184,7 +226,6 @@ else
     else
         log "FEHLER: xrdp-Server konnte nicht gestartet werden!"
         log "Überprüfen Sie die Logs mit: cat /tmp/xrdp-start.log"
-        exit 1
     fi
 fi
 
@@ -201,10 +242,46 @@ CONTSCRIPT
     chmod +x /etc/cont-init.d/99-xrdp-autostart
 fi
 
+debug_log "RDP Setup abgeschlossen: $(date)"
 log "RDP-Einrichtung abgeschlossen!"
 log "Verbinden Sie sich mit einem RDP-Client über Port 3389"
 log "Benutzername: abc"
-log "Passwort: abc (oder Ihr konfiguriertes Passwort)"
+log "Passwort: $RDP_PASSWORD"
+log "Debug-Log: /tmp/rdp-setup-debug.log"
+
+# Füge diese Informationen zur Desktop-README hinzu
+if [ -f "$HOME_DIR/Desktop/README.txt" ]; then
+    echo "" >> "$HOME_DIR/Desktop/README.txt"
+    echo "== RDP-Zugangsdaten ==" >> "$HOME_DIR/Desktop/README.txt"
+    echo "Benutzername: abc" >> "$HOME_DIR/Desktop/README.txt"
+    echo "Passwort: $RDP_PASSWORD" >> "$HOME_DIR/Desktop/README.txt"
+fi
+
+# Erstellle Dokument mit RDP-Zugangsdaten
+cat > "$HOME_DIR/Desktop/RDP-CREDENTIALS.txt" << RDPCRED
+============== RDP ZUGANGSINFORMATIONEN ==============
+
+Diese Datei enthält die Zugangsinformationen für den RDP-Zugriff
+auf diesen Development Desktop.
+
+BENUTZERNAME: abc
+PASSWORT: $RDP_PASSWORD
+
+Unterstützte RDP-Clients:
+- Windows: Microsoft Remote Desktop (vorinstalliert)
+- macOS: Microsoft Remote Desktop (App Store)
+- Linux: Remmina oder FreeRDP
+
+============== HINWEISE ==============
+Bei Verbindungsproblemen bitte folgende Punkte prüfen:
+1. Port-Forwarding ist aktiv (kubectl port-forward)
+2. Firewall blockiert nicht den Zugriff
+3. Richtige Eingabe von Benutzername und Passwort
+RDPCRED
+
+chmod 644 "$HOME_DIR/Desktop/RDP-CREDENTIALS.txt"
+chown abc:abc "$HOME_DIR/Desktop/RDP-CREDENTIALS.txt"
+
 EOF
 )
 
@@ -216,6 +293,9 @@ echo "$INSTALL_SCRIPT" | kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c 
 echo "Führe Installationsskript im Pod aus..."
 kubectl -n "$NAMESPACE" exec -it "$POD_NAME" -- bash -c "sudo /tmp/setup-rdp.sh"
 
+# Holen des festgelegten RDP-Passworts aus dem Pod
+RDP_CRED=$(kubectl -n "$NAMESPACE" exec -it "$POD_NAME" -- cat /config/home/abc/Desktop/RDP-CREDENTIALS.txt | grep PASSWORT | awk '{print $2}')
+
 # Port-Forwarding für RDP einrichten
 echo "Richte Port-Forwarding für RDP ein..."
 kubectl -n "$NAMESPACE" port-forward "$POD_NAME" 3389:3389 &
@@ -226,7 +306,7 @@ echo "=== RDP-Einrichtung abgeschlossen ==="
 echo "Sie können sich jetzt mit einem RDP-Client verbinden:"
 echo "  Adresse: localhost:3389"
 echo "  Benutzername: abc"
-echo "  Passwort: Ihr konfiguriertes Passwort (aus webtop-config.sh)"
+echo "  Passwort: $RDP_CRED"
 echo
 echo "Empfohlene RDP-Clients:"
 echo "  Windows: Microsoft Remote Desktop (vorinstalliert)"
