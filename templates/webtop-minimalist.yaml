@@ -1,0 +1,175 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-xfce
+  namespace: $NAMESPACE
+  labels:
+    service: webtop
+spec:
+  selector:
+    matchLabels:
+      service: webtop
+  template:
+    metadata:
+      labels:
+        service: webtop
+    spec:
+      containers:
+        - image: lscr.io/linuxserver/webtop:ubuntu-xfce
+          name: ubuntu-xfce
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: SUBFOLDER
+              value: "/"
+            - name: TITLE
+              value: "HAW Development Desktop"
+            - name: PASSWORD
+              value: "$VNC_PASSWORD"
+          volumeMounts:
+            - mountPath: "/config"
+              name: webtop-volume
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+            - containerPort: 3001
+              name: https
+              protocol: TCP
+          resources:
+            limits:
+              memory: "$MEMORY_LIMIT"
+              cpu: "$CPU_LIMIT"
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "/bin/bash"
+                  - "-c"
+                  - |
+                    # Fehlerbehandlung aktivieren
+                    set -e
+                    
+                    # Banner
+                    echo "=====================================================
+                    HAW Development Desktop - Installation läuft
+                    ====================================================="
+                    
+                    # Robuster Update-Prozess
+                    echo "Aktualisiere Paketlisten... (1. Versuch)"
+                    apt-get update || true
+                    
+                    # Warte auf Network-Manager
+                    echo "Warte auf Network-Manager..."
+                    sleep 10
+                    
+                    # Aktualisiere erneut
+                    echo "Aktualisiere Paketlisten... (2. Versuch)"
+                    apt-get update || true
+                    
+                    # Installiere grundlegende Tools
+                    echo "Installiere Terminal und Firefox..."
+                    apt-get install -y --no-install-recommends xfce4-terminal firefox || true
+                    
+                    # Desktop-Verzeichnis erstellen falls nicht vorhanden
+                    echo "Erstelle Desktop-Verknüpfungen..."
+                    mkdir -p /config/home/abc/Desktop
+                    
+                    # Erstelle README-Datei für den Desktop
+                    cat > /config/home/abc/Desktop/README-HAW.txt << EOL
+                    # HAW Development Desktop - Kurzanleitung
+                    
+                    Dies ist ein Ubuntu Linux mit XFCE Desktop für die Entwicklung.
+                    
+                    ## Erste Schritte:
+                    1. Öffne das Terminal mit Strg+Alt+T
+                    2. Installiere zusätzliche Tools nach Bedarf:
+                       * VS Code: 
+                         sudo apt-get update
+                         sudo apt-get install -y apt-transport-https wget
+                         wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/packages.microsoft.gpg
+                         sudo install -D -o root -g root -m 644 /tmp/packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+                         sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+                         sudo apt-get update
+                         sudo apt-get install -y code
+                       
+                       * Sublime Text:
+                         sudo apt-get update
+                         sudo apt-get install -y apt-transport-https wget
+                         wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-archive.gpg > /dev/null
+                         echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+                         sudo apt-get update
+                         sudo apt-get install -y sublime-text
+                       
+                       * Ansible:
+                         sudo apt-get update
+                         sudo apt-get install -y software-properties-common
+                         sudo add-apt-repository --yes --update ppa:ansible/ansible
+                         sudo apt-get install -y ansible
+                    
+                    ## Zugriff:
+                    - Browser: http://localhost:3000 oder https://localhost:3001
+                    - VNC-Client: Port 5900 (wenn eingerichtet)
+                    - RDP-Client: Port 3389 (wenn eingerichtet)
+                    
+                    ## Wichtige Ordner:
+                    - Persönlicher Ordner: /config/home/abc
+                    - Desktop: /config/home/abc/Desktop
+                    - Projektordner: /config/home/abc/projects
+                    
+                    ## Dateiaustausch:
+                    - Über den Browser: Upload/Download-Button in der oberen Menüleiste
+                    - Über Git: Klonen und Pushen von/zu GitHub oder GitLab
+                    EOL
+                    
+                    # Erstelle Projekte-Ordner
+                    mkdir -p /config/home/abc/projects
+                    
+                    # Erstelle ein einfaches Terminal-Shortcut
+                    cat > /config/home/abc/Desktop/terminal.desktop << EOL
+                    [Desktop Entry]
+                    Name=Terminal
+                    Comment=Öffne eine Terminal-Sitzung
+                    Exec=xfce4-terminal
+                    Icon=utilities-terminal
+                    Type=Application
+                    StartupNotify=true
+                    Categories=System;TerminalEmulator;
+                    EOL
+                    
+                    # Berechtigungen setzen
+                    chmod +x /config/home/abc/Desktop/*.desktop
+                    chown -R abc:abc /config/home/abc
+                    
+                    # Installationshinweis
+                    echo "Desktop ist einsatzbereit! Weitere Tools können bei Bedarf installiert werden."
+                    echo "Installation abgeschlossen am $(date)" > /config/installation_complete.txt
+      volumes:
+        - name: webtop-volume
+          persistentVolumeClaim:
+            claimName: webtop-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-xfce
+  namespace: $NAMESPACE
+  labels:
+    service: webtop
+spec:
+  ports:
+    - name: http
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+    - name: https
+      port: 3001
+      protocol: TCP
+      targetPort: 3001
+  selector:
+    service: webtop
+  type: ClusterIP
