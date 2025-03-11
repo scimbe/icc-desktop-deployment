@@ -141,21 +141,70 @@ chmod +x ${HOME_DIR}/.xsession
 # Setze Berechtigungen für alle Dateien im Home-Verzeichnis
 chown -R abc:abc ${HOME_DIR}
 
-# Passe Firewall an (falls ufw installiert ist)
-if command -v ufw >/dev/null 2>&1; then
-    log "Konfiguriere Firewall für RDP..."
-    ufw allow 3389/tcp
+# Container-freundlicher Dienst-Start (ohne systemd)
+log "Starte xrdp-Dienste direkt (ohne systemd)..."
+
+# Konfiguriere xrdp für automatischen Start
+if [ -d "/etc/default" ]; then
+    echo "ENABLED=true" > /etc/default/xrdp
 fi
 
-# Starte xrdp-Dienst neu
-log "Starte xrdp-Dienst neu..."
-systemctl enable xrdp
-systemctl restart xrdp
+# Stoppe xrdp falls es bereits läuft
+if pgrep xrdp >/dev/null; then
+    log "Stoppe xrdp-Prozesse..."
+    pkill -f xrdp || true
+    sleep 2
+fi
 
-log "RDP-Installation abgeschlossen!"
+# Starte xrdp und speichere die Prozess-ID
+log "Starte xrdp-Server..."
+/usr/sbin/xrdp &
+XRDP_PID=$!
+sleep 2
+
+# Starte xrdp-Sesman und speichere die Prozess-ID
+log "Starte xrdp-Sitzungsmanager..."
+/usr/sbin/xrdp-sesman &
+SESMAN_PID=$!
+
+# Überprüfe, ob die Prozesse laufen
+sleep 2
+if ps -p $XRDP_PID > /dev/null && ps -p $SESMAN_PID > /dev/null; then
+    log "xrdp-Dienste wurden erfolgreich gestartet."
+else
+    log "WARNUNG: xrdp-Dienste konnten nicht gestartet werden."
+    log "Versuche alternative Startmethode..."
+    
+    # Alternative Startmethode
+    nohup /etc/init.d/xrdp start >/tmp/xrdp-start.log 2>&1 &
+    sleep 3
+    
+    if pgrep xrdp >/dev/null; then
+        log "xrdp-Server läuft jetzt."
+    else
+        log "FEHLER: xrdp-Server konnte nicht gestartet werden!"
+        log "Überprüfen Sie die Logs mit: cat /tmp/xrdp-start.log"
+        exit 1
+    fi
+fi
+
+# Erstelle einen Startup-Eintrag für automatischen Start bei Container-Neustart
+if [ -d "/etc/cont-init.d" ]; then
+    log "Erstelle Container-Init-Skript für xrdp..."
+    cat > /etc/cont-init.d/99-xrdp-autostart << 'CONTSCRIPT'
+#!/bin/bash
+echo "Starte xrdp-Dienste automatisch..."
+/usr/sbin/xrdp &
+sleep 2
+/usr/sbin/xrdp-sesman &
+CONTSCRIPT
+    chmod +x /etc/cont-init.d/99-xrdp-autostart
+fi
+
+log "RDP-Einrichtung abgeschlossen!"
 log "Verbinden Sie sich mit einem RDP-Client über Port 3389"
 log "Benutzername: abc"
-log "Passwort: [Ihr konfiguriertes Passwort]"
+log "Passwort: abc (oder Ihr konfiguriertes Passwort)"
 EOF
 )
 
