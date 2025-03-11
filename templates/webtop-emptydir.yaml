@@ -19,7 +19,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: ubuntu-xfce
-          image: lscr.io/linuxserver/webtop:ubuntu-xfce
+          image: lscr.io/linuxserver/webtop:latest
           securityContext:
             privileged: false
             allowPrivilegeEscalation: true

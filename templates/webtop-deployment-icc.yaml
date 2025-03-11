@@ -15,7 +15,7 @@ spec:
         service: webtop
     spec:
       containers:
-        - image: lscr.io/linuxserver/webtop:ubuntu-xfce
+        - image: lscr.io/linuxserver/webtop:latest
           name: ubuntu-xfce
           env:
             - name: PUID
