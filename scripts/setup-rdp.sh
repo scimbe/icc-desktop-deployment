@@ -16,7 +16,7 @@ else
 fi
 
 # Hole den Pod-Namen
-POD_NAME=$(kubectl -n "$NAMESPACE" get pods -l app=webtop -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+POD_NAME=$(kubectl -n "$NAMESPACE" get pods -l service=webtop -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
 if [ -z "$POD_NAME" ]; then
     echo "Fehler: Kein laufender Pod für das Webtop Deployment gefunden."
     exit 1
