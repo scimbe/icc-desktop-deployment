@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubuntu-xfce
+  name: debian-xfce
   namespace: $NAMESPACE
   labels:
     app: webtop
-    type: ubuntu-xfce
+    type: debian-xfce
 spec:
   selector:
     matchLabels:
@@ -19,7 +19,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: ubuntu-xfce
-          image: lscr.io/linuxserver/webtop:latest
+          image: lscr.io/linuxserver/webtop:debian-xfce
           securityContext:
             privileged: false
             allowPrivilegeEscalation: true
@@ -172,7 +172,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ubuntu-xfce
+  name: debian-xfce
   namespace: $NAMESPACE
   labels:
     app: webtop

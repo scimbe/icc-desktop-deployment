@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ubuntu-xfce
+  name: debian-xfce
   namespace: $NAMESPACE
   labels:
     service: webtop
@@ -15,8 +15,8 @@ spec:
         service: webtop
     spec:
       containers:
-        - image: lscr.io/linuxserver/webtop:latest
-          name: ubuntu-xfce
+        - image: lscr.io/linuxserver/webtop:debian-xfce
+          name: debian-xfce
           env:
             - name: PUID
               value: "1000"
@@ -140,7 +140,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ubuntu-xfce
+  name: debian-xfce
   namespace: $NAMESPACE
   labels:
     service: webtop
