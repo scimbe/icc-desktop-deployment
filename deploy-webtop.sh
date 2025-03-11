@@ -52,7 +52,9 @@ chmod +x "$SCRIPT_DIR/scripts/port-forward-webtop.sh"
 chmod +x "$SCRIPT_DIR/scripts/setup-rdp.sh"
 
 # Prüfe ICC-Verbindung
-if ! kubectl cluster-info &> /dev/null; then
+CURRENT_NS=$(kubectl config view --minify -o jsonpath='{..namespace}')
+
+if ! kubectl cluster-info -n $CURRENT_NS  &> /dev/null; then
   echo "Keine Verbindung zur ICC. Bitte stellen Sie sicher, dass Sie angemeldet sind."
   echo "Führen Sie das Login-Skript aus oder stellen Sie die VPN-Verbindung her."
   exit 1
