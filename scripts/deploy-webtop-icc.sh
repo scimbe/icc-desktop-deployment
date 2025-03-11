@@ -129,6 +129,65 @@ if [ -n "$POD_NAME" ]; then
     POD_STATUS=$(kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o jsonpath='{.status.phase}')
     if [ "$POD_STATUS" = "Running" ]; then
         echo -e "\n${GREEN}debian XFCE Desktop mit Entwicklungstools erfolgreich bereitgestellt.${NC}"
+        
+        # Git-Repository auschecken und Ansible-Playbook ausführen
+        echo -e "\n${GREEN}Schritt 3: Repository auschecken und Ansible-Playbook ausführen...${NC}"
+        
+        # Skript zur Ausführung im Container erstellen
+        GIT_ANSIBLE_SCRIPT=$(cat << 'EOF'
+#!/bin/bash
+set -e
+
+# Wechsle ins Home-Verzeichnis des Benutzers abc
+cd /config/home/abc
+
+# Installiere benötigte Pakete (falls noch nicht vorhanden)
+if ! command -v git &> /dev/null || ! command -v ansible &> /dev/null; then
+    echo "Installiere benötigte Pakete..."
+    apt-get update
+    apt-get install -y git ansible
+fi
+
+# Clone das Repository mit dem spezifischen Branch
+echo "Clone ansible-basic Repository (Branch: icc)..."
+if [ -d "ansible-basic" ]; then
+    echo "Repository existiert bereits, update wird durchgeführt..."
+    cd ansible-basic
+    git fetch
+    git checkout icc
+    git pull
+else
+    git clone -b icc https://github.com/scimbe/ansible-basic.git
+    cd ansible-basic
+fi
+
+# Erstelle localhost Inventar-Datei falls nicht vorhanden
+if [ ! -f "localhost" ]; then
+    echo "Erstelle localhost Inventar-Datei..."
+    echo "localhost ansible_connection=local" > localhost
+fi
+
+# Setze Berechtigungen
+cd ..
+chown -R abc:abc ansible-basic
+
+# Führe das Ansible-Playbook aus
+echo "Führe Ansible-Playbook aus..."
+cd /config/home/abc
+sudo -u abc ansible-playbook -i ansible-basic/localhost ansible-basic/playbooks/linux/xfc4/pl-xfc4-playbook.yml
+
+echo "Ansible-Playbook wurde ausgeführt."
+EOF
+)
+        
+        # Temporäre Datei im Container erstellen und ausführen
+        echo -e "${YELLOW}Führe Git-Checkout und Ansible-Playbook im Container aus...${NC}"
+        echo "$GIT_ANSIBLE_SCRIPT" | kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "cat > /tmp/git_ansible_script.sh && chmod +x /tmp/git_ansible_script.sh"
+        
+        # Skript im Container ausführen
+        kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "sudo /tmp/git_ansible_script.sh"
+        
+        echo -e "\n${GREEN}Git-Repository wurde ausgecheckt und Ansible-Playbook wurde ausgeführt.${NC}"
     else
         echo -e "\n${YELLOW}Pod ist im Status '$POD_STATUS'. Mögliche Probleme:${NC}"
         kubectl -n "$NAMESPACE" describe pod "$POD_NAME"
