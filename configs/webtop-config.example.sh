@@ -17,4 +17,4 @@ export VNC_PASSWORD="haw-password"  # Bitte ändern Sie dies in ein sicheres Pas
 
 # Persistenter Speicher einrichten
 export ENABLE_PERSISTENCE=true
-export STORAGE_SIZE="20Gi"  # 20GB für Entwicklungsprojekte
+export STORAGE_SIZE="10Gi"  # max 10GB für Entwicklungsprojekte
