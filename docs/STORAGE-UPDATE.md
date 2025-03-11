@@ -8,7 +8,7 @@ Alle PersistentVolumeClaim (PVC) Templates wurden aktualisiert, um die `storageC
 
 - `templates/webtop-pvc-icc.yaml`
 - `templates/webtop-pvc.yaml`
-- Inline-PVC in `templates/ubuntu-xfce-deployment.yaml`
+- Inline-PVC in `templates/debian-xfce-deployment.yaml`
 
 ## 2. Neue Hilfsskripte und Dokumentation
 

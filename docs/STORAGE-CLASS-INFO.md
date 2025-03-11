@@ -35,7 +35,7 @@ Die folgenden Dateien wurden aktualisiert, um diese Storage-Klasse zu verwenden:
 
 1. `templates/webtop-pvc-icc.yaml`
 2. `templates/webtop-pvc.yaml`
-3. `templates/ubuntu-xfce-deployment.yaml` (inline-PVC)
+3. `templates/debian-xfce-deployment.yaml` (inline-PVC)
 
 ## Hinweise für Deployment-Skripte
 
