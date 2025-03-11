@@ -24,8 +24,8 @@ Dieses Projekt bietet Skripte und Konfigurationsdateien zur Bereitstellung einer
 
 1. **Repository klonen**:
    ```bash
-   git clone https://github.com/yourusername/icc-ubuntu-desktop-deployment.git
-   cd icc-ubuntu-desktop-deployment
+   git clone https://github.com/yourusername/icc-desktop-deployment.git
+   cd icc-desktop-deployment
    ```
 
 2. **Ausführungsberechtigungen setzen**:
