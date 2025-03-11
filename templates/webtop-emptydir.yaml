@@ -39,12 +39,6 @@ spec:
               value: "/"
             - name: TITLE
               value: "HAW Development Desktop"
-            # Installation der Entwicklungstools
-            - name: DOCKER_MODS
-              value: "linuxserver/mods:universal-package-install"
-            - name: INSTALL_PACKAGES
-              value: "code sublime-text ansible git curl wget xdg-utils gnupg2 apt-transport-https software-properties-common build-essential python3-pip"
-            # Wenn Sie ein Passwort setzen wollen (empfohlen)
             - name: PASSWORD
               value: "$VNC_PASSWORD"
           lifecycle:
@@ -54,32 +48,42 @@ spec:
                   - "/bin/bash"
                   - "-c"
                   - |
-                    # Warte bis apt verfügbar ist
-                    until apt-get update; do sleep 2; done
+                    # Robuster Update-Prozess
+                    echo "Aktualisiere Paketlisten..."
+                    apt-get update || (sleep 10 && apt-get update) || (sleep 30 && apt-get update)
                     
-                    # Füge VSCode Repository hinzu (falls nicht durch universal-package-install installiert)
-                    if ! dpkg -l code > /dev/null 2>&1; then
-                      wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg
-                      install -o root -g root -m 644 /tmp/microsoft.gpg /etc/apt/trusted.gpg.d/
-                      echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list
-                      apt-get update && apt-get install -y code
-                    fi
+                    # Notwendige Tools für Repositories installieren
+                    echo "Installiere grundlegende Tools..."
+                    apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release software-properties-common
                     
-                    # Füge Sublime Text Repository hinzu (falls nicht durch universal-package-install installiert)
-                    if ! dpkg -l sublime-text > /dev/null 2>&1; then
-                      wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | apt-key add -
-                      echo "deb https://download.sublimetext.com/ apt/stable/" > /etc/apt/sources.list.d/sublime-text.list
-                      apt-get update && apt-get install -y sublime-text
-                    fi
+                    # Microsoft Repository für VS Code hinzufügen
+                    echo "Füge VS Code Repository hinzu..."
+                    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft-archive-keyring.gpg
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list
                     
-                    # Füge Ansible Repository hinzu (falls nicht durch universal-package-install installiert)
-                    if ! dpkg -l ansible > /dev/null 2>&1; then
-                      apt-get update && apt-get install -y software-properties-common
-                      apt-add-repository --yes --update ppa:ansible/ansible
-                      apt-get install -y ansible
-                    fi
+                    # Sublime Text Repository hinzufügen
+                    echo "Füge Sublime Text Repository hinzu..."
+                    curl -sSL https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor > /usr/share/keyrings/sublime-text-archive-keyring.gpg
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/sublime-text-archive-keyring.gpg] https://download.sublimetext.com/ apt/stable/" > /etc/apt/sources.list.d/sublime-text.list
                     
-                    # Erstelle Desktop-Shortcuts
+                    # Ansible Repository hinzufügen
+                    echo "Füge Ansible Repository hinzu..."
+                    add-apt-repository --yes --update ppa:ansible/ansible
+                    
+                    # Update nach Hinzufügen der Repositories
+                    echo "Aktualisiere Paketlisten nach Hinzufügen der Repositories..."
+                    apt-get update
+                    
+                    # Pakete installieren
+                    echo "Installiere Firefox und Terminal..."
+                    apt-get install -y xfce4-terminal firefox
+                    
+                    echo "Installiere Entwicklungstools..."
+                    apt-get install -y git wget curl xdg-utils build-essential python3-pip
+                    apt-get install -y code sublime-text ansible
+                    
+                    # Desktop-Verzeichnis erstellen falls nicht vorhanden
+                    echo "Erstelle Desktop-Verknüpfungen..."
                     mkdir -p /config/home/abc/Desktop
                     
                     # VSCode Desktop-Shortcut
@@ -135,9 +139,6 @@ spec:
                     chmod +x /config/home/abc/Desktop/*.desktop
                     chown -R abc:abc /config/home/abc
                     
-                    # Set-up für Multi-Plattform-Zugriff
-                    apt-get install -y firefox remmina vinagre freerdp2-x11 tigervnc-viewer
-                    
                     # Schreibe eine README-Datei mit Zugriffsinformationen
                     cat > /config/home/abc/Desktop/README.txt << EOL
                     HAW Development Desktop - Zugriffsinformationen
@@ -160,6 +161,13 @@ spec:
                     Alle Ihre Daten gehen verloren, wenn der Pod neu gestartet wird!
                     Sichern Sie wichtige Daten regelmäßig durch Download.
                     EOL
+                    
+                    # Installiere Verbindungstools für Multi-Plattform-Zugriff
+                    echo "Installiere Verbindungstools für Multi-Plattform-Zugriff..."
+                    apt-get install -y remmina vinagre freerdp2-x11 tigervnc-viewer
+                    
+                    # Statusdatei erstellen
+                    echo "Installation abgeschlossen am $(date)" > /config/installation_complete.txt
           resources:
             limits:
               memory: "$MEMORY_LIMIT"
