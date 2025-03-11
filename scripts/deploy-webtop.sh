@@ -36,30 +36,100 @@ echo "Ressourcen: $MEMORY_LIMIT RAM, $CPU_LIMIT CPU"
 echo "Persistenter Speicher: $STORAGE_SIZE"
 echo
 
-# Erstelle temporäre YAML-Datei für das Deployment
-TMP_FILE=$(mktemp)
+# Erstelle temporäre YAML-Dateien für das Deployment
+PVC_TMP_FILE=$(mktemp)
+DEPLOY_TMP_FILE=$(mktemp)
+
+# Ersetze Variablen in der PVC-YAML-Datei
+cat "$ROOT_DIR/templates/webtop-pvc.yaml" | \
+    sed "s/\$NAMESPACE/$NAMESPACE/g" | \
+    sed "s/\$STORAGE_SIZE/$STORAGE_SIZE/g" > "$PVC_TMP_FILE"
 
 # Ersetze Variablen in der Deployment-YAML-Datei
-cat "$ROOT_DIR/templates/ubuntu-xfce-deployment.yaml" | \
+cat "$ROOT_DIR/templates/webtop-deployment.yaml" | \
     sed "s/\$NAMESPACE/$NAMESPACE/g" | \
     sed "s/\$MEMORY_LIMIT/$MEMORY_LIMIT/g" | \
     sed "s/\$CPU_LIMIT/$CPU_LIMIT/g" | \
-    sed "s/\$VNC_PASSWORD/$VNC_PASSWORD/g" | \
-    sed "s/\$STORAGE_SIZE/$STORAGE_SIZE/g" > "$TMP_FILE"
+    sed "s/\$VNC_PASSWORD/$VNC_PASSWORD/g" > "$DEPLOY_TMP_FILE"
 
-# Anwenden der Konfiguration
-echo "Deploying Ubuntu XFCE mit Entwicklungstools zu namespace $NAMESPACE..."
-kubectl apply -f "$TMP_FILE"
+# Zeige Kubernetes-Ereignisse im Namespace an
+echo "Aktuelle Kubernetes-Ereignisse im Namespace:"
+kubectl -n "$NAMESPACE" get events --sort-by=.metadata.creationTimestamp | tail -5
+
+# Anwenden der PVC-Konfiguration
+echo -e "\nSchritt 1: Erstelle PersistentVolumeClaim..."
+kubectl apply -f "$PVC_TMP_FILE"
+
+# Warte kurz, um sicherzustellen, dass der PVC erstellt wurde
+echo "Warte auf PVC-Erstellung..."
+sleep 5
+
+# Versuche 3 Mal, den PVC zu überprüfen, mit zunehmender Wartezeit
+for i in {1..3}; do
+    if kubectl -n "$NAMESPACE" get pvc webtop-pvc &> /dev/null; then
+        echo "PVC 'webtop-pvc' erfolgreich erstellt."
+        break
+    else
+        echo "Warte weitere $((5*i)) Sekunden auf PVC-Erstellung..."
+        sleep $((5*i))
+        
+        if [ $i -eq 3 ] && ! kubectl -n "$NAMESPACE" get pvc webtop-pvc &> /dev/null; then
+            echo -e "\n${RED}Fehler: PVC 'webtop-pvc' wurde nicht erstellt.${NC}"
+            echo "PVC-Ereignisse:"
+            kubectl -n "$NAMESPACE" get events --field-selector involvedObject.kind=PersistentVolumeClaim
+            
+            echo -e "\nMöchten Sie dennoch versuchen, das Deployment zu erstellen? (j/N)"
+            read -r CONTINUE
+            if [[ ! $CONTINUE =~ ^[Jj]$ ]]; then
+                rm "$PVC_TMP_FILE" "$DEPLOY_TMP_FILE"
+                exit 1
+            fi
+        fi
+    fi
+done
+
+# Anwenden der Deployment-Konfiguration
+echo -e "\nSchritt 2: Erstelle Deployment und Service..."
+kubectl apply -f "$DEPLOY_TMP_FILE"
 
 # Aufräumen
-rm "$TMP_FILE"
+rm "$PVC_TMP_FILE" "$DEPLOY_TMP_FILE"
 
 # Warte auf das Deployment
 echo "Warte auf das Ubuntu XFCE Deployment..."
 echo "Dies kann einige Minuten dauern, da die Installation von VS Code, Sublime Text und Ansible Zeit benötigt..."
-kubectl -n "$NAMESPACE" rollout status deployment/"$WEBTOP_DEPLOYMENT_NAME" --timeout=600s
+kubectl -n "$NAMESPACE" rollout status deployment/"$WEBTOP_DEPLOYMENT_NAME" --timeout=600s || {
+    echo -e "\nWARNUNG: Timeout beim Warten auf das Deployment."
+    echo "Aktueller Status des Deployments:"
+    kubectl -n "$NAMESPACE" get pods -l app=webtop
+    echo -e "\nÜberprüfen Sie die Pod-Events:"
+    kubectl -n "$NAMESPACE" get events --field-selector involvedObject.kind=Pod --sort-by=.metadata.creationTimestamp | tail -10
+}
 
-echo "Ubuntu XFCE Desktop mit Entwicklungstools erfolgreich bereitgestellt."
+# Zeige den aktuellen Status an
+POD_NAME=$(kubectl -n "$NAMESPACE" get pods -l app=webtop -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+if [ -n "$POD_NAME" ]; then
+    echo -e "\nPod-Status:"
+    kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o wide
+    
+    # Prüfe, ob der Pod im Status "Running" ist
+    POD_STATUS=$(kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o jsonpath='{.status.phase}')
+    if [ "$POD_STATUS" = "Running" ]; then
+        echo -e "\nUbuntu XFCE Desktop mit Entwicklungstools erfolgreich bereitgestellt."
+    else
+        echo -e "\nWARNUNG: Pod ist im Status '$POD_STATUS'. Möglicherweise gibt es Probleme."
+        echo "Pod-Logs anzeigen? (j/N)"
+        read -r SHOW_LOGS
+        if [[ $SHOW_LOGS =~ ^[Jj]$ ]]; then
+            kubectl -n "$NAMESPACE" logs "$POD_NAME"
+        fi
+    fi
+else
+    echo -e "\nFehler: Kein Pod für das Webtop-Deployment gefunden."
+    echo "Überprüfen Sie die Deployment-Events:"
+    kubectl -n "$NAMESPACE" get events --field-selector involvedObject.kind=Deployment
+fi
+
 echo
 echo "HINWEIS: Die Installation aller Tools kann noch im Hintergrund laufen."
 echo "Beim ersten Start könnten einige Anwendungen noch nicht verfügbar sein."
