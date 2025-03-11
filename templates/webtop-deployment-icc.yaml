@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-xfce
+  namespace: $NAMESPACE
+  labels:
+    service: webtop
+spec:
+  selector:
+    matchLabels:
+      service: webtop
+  template:
+    metadata:
+      labels:
+        service: webtop
+    spec:
+      containers:
+        - image: lscr.io/linuxserver/webtop:ubuntu-xfce
+          name: ubuntu-xfce
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: SUBFOLDER
+              value: "/"
+            - name: TITLE
+              value: "HAW Development Desktop"
+            - name: PASSWORD
+              value: "$VNC_PASSWORD"
+            - name: DOCKER_MODS
+              value: "linuxserver/mods:universal-package-install"
+            - name: INSTALL_PACKAGES
+              value: "code sublime-text ansible git curl wget xdg-utils gnupg2 apt-transport-https software-properties-common build-essential python3-pip"
+          volumeMounts:
+            - mountPath: "/config"
+              name: webtop-volume
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+            - containerPort: 3001
+              name: https
+              protocol: TCP
+          resources:
+            limits:
+              memory: "$MEMORY_LIMIT"
+              cpu: "$CPU_LIMIT"
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "/bin/bash"
+                  - "-c"
+                  - |
+                    # Warte bis apt verfügbar ist
+                    until apt-get update; do sleep 2; done
+                    
+                    # Installation von Tools
+                    apt-get install -y xfce4-terminal firefox
+                    
+                    # Erstelle Desktop-Shortcuts
+                    mkdir -p /config/home/abc/Desktop
+                    
+                    # VSCode Desktop-Shortcut
+                    cat > /config/home/abc/Desktop/vscode.desktop << EOL
+                    [Desktop Entry]
+                    Name=Visual Studio Code
+                    Comment=Code Editing. Redefined.
+                    GenericName=Text Editor
+                    Exec=/usr/bin/code --no-sandbox
+                    Icon=vscode
+                    Type=Application
+                    StartupNotify=true
+                    Categories=Utility;TextEditor;Development;IDE;
+                    EOL
+                    
+                    # Sublime Text Desktop-Shortcut
+                    cat > /config/home/abc/Desktop/sublime-text.desktop << EOL
+                    [Desktop Entry]
+                    Name=Sublime Text
+                    Comment=Sophisticated text editor for code, markup and prose
+                    Exec=/usr/bin/subl
+                    Icon=sublime-text
+                    Type=Application
+                    Terminal=false
+                    Categories=TextEditor;Development;
+                    EOL
+                    
+                    # Ansible Desktop-Shortcut
+                    cat > /config/home/abc/Desktop/ansible-terminal.desktop << EOL
+                    [Desktop Entry]
+                    Name=Ansible Terminal
+                    Comment=Open Terminal with Ansible
+                    Exec=xfce4-terminal --command="bash -c 'echo \"Welcome to Ansible Terminal. Run ansible --version to verify installation.\"; bash'"
+                    Icon=utilities-terminal
+                    Type=Application
+                    Terminal=false
+                    Categories=Development;System;
+                    EOL
+                    
+                    # Setze richtige Berechtigungen
+                    chmod +x /config/home/abc/Desktop/*.desktop
+                    chown -R abc:abc /config/home/abc
+      volumes:
+        - name: webtop-volume
+          persistentVolumeClaim:
+            claimName: webtop-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-xfce
+  namespace: $NAMESPACE
+  labels:
+    service: webtop
+spec:
+  ports:
+    - name: http
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+    - name: https
+      port: 3001
+      protocol: TCP
+      targetPort: 3001
+  selector:
+    service: webtop
+  type: ClusterIP

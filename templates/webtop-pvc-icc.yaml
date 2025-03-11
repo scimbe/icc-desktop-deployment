@@ -1,0 +1,13 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: webtop-pvc
+  namespace: $NAMESPACE
+  labels:
+    service: webtop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: $STORAGE_SIZE
