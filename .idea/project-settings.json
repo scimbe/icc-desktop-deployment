@@ -1,0 +1,126 @@
+// IntelliJ IDEA-spezifische Einstellungen für das ICC Desktop-Projekt
+
+{
+  // Editor-Einstellungen
+  "editor.config.applications": [
+    "shell",
+    "kubernetes"
+  ],
+  
+  // Shell-spezifische Einstellungen
+  "shell": {
+    "shellcheck.enable": true,
+    "shellcheck.useWorkspaceRootAsCwd": true,
+    "shellcheck.ignorePatterns": {
+      "**/*.zsh": true
+    }
+  },
+  
+  // Dateivorlagen für neue Skripte
+  "fileTemplates": {
+    "Shell Script": "#!/bin/bash\n\n# Beschreibung: \n\nset -e\n\n# Funktionen\n\n# Hauptprogramm\n",
+    "Kubernetes Manifest": "apiVersion: v1\nkind: \nmetadata:\n  name: \n  namespace: $NAMESPACE\nspec:\n  "
+  },
+  
+  // Live-Templates für häufig verwendeten Code
+  "liveTemplates": {
+    "function": "function ${NAME}() {\n  ${BODY}\n}",
+    "kubectl": "kubectl -n \"$NAMESPACE\" ${COMMAND}",
+    "podname": "POD_NAME=$(kubectl -n \"$NAMESPACE\" get pods -l ${SELECTOR} -o jsonpath='{.items[0].metadata.name}')"
+  },
+  
+  // Run-Konfigurationen
+  "runConfigurations": [
+    {
+      "name": "Deploy Webtop",
+      "type": "ShellScript",
+      "scriptPath": "$PROJECT_DIR$/deploy-webtop.sh",
+      "workingDirectory": "$PROJECT_DIR$"
+    },
+    {
+      "name": "Port Forward Webtop",
+      "type": "ShellScript",
+      "scriptPath": "$PROJECT_DIR$/scripts/port-forward-webtop.sh",
+      "workingDirectory": "$PROJECT_DIR$"
+    },
+    {
+      "name": "Cleanup Webtop",
+      "type": "ShellScript",
+      "scriptPath": "$PROJECT_DIR$/scripts/cleanup-webtop.sh",
+      "workingDirectory": "$PROJECT_DIR$"
+    },
+    {
+      "name": "Setup RDP",
+      "type": "ShellScript",
+      "scriptPath": "$PROJECT_DIR$/scripts/setup-rdp.sh",
+      "workingDirectory": "$PROJECT_DIR$"
+    },
+    {
+      "name": "ICC Desktop Manager",
+      "type": "ShellScript",
+      "scriptPath": "$PROJECT_DIR$/icc-desktop-manager.sh",
+      "workingDirectory": "$PROJECT_DIR$"
+    }
+  ],
+  
+  // Externe Tools
+  "externalTools": [
+    {
+      "name": "Shellcheck",
+      "program": "shellcheck",
+      "parameters": "-x $FilePath$",
+      "workingDirectory": "$ProjectFileDir$"
+    },
+    {
+      "name": "Kubectl Version",
+      "program": "kubectl",
+      "parameters": "version",
+      "workingDirectory": "$ProjectFileDir$"
+    },
+    {
+      "name": "Kubectl Current Context",
+      "program": "kubectl",
+      "parameters": "config current-context",
+      "workingDirectory": "$ProjectFileDir$"
+    }
+  ],
+  
+  // Datei-Muster
+  "filePatterns": {
+    "*.sh": {
+      "filetype": "Shell Script",
+      "indexing.enabled": true
+    },
+    "*.yaml": {
+      "filetype": "YAML",
+      "indexing.enabled": true
+    },
+    "*.md": {
+      "filetype": "Markdown",
+      "indexing.enabled": true
+    }
+  },
+  
+  // Problemerkennungsmuster
+  "problemPatterns": [
+    {
+      "regexp": "line (\\d+):(\\d+): (warning|error): (.+)",
+      "file": 0,
+      "line": 1,
+      "column": 2,
+      "severity": 3,
+      "message": 4
+    }
+  ],
+  
+  // VCS-Einstellungen
+  "vcs": {
+    "git.rootMarkers": [
+      ".git"
+    ],
+    "git.ignoreFiles": [
+      ".idea/workspace.xml",
+      "**/.DS_Store"
+    ]
+  }
+}

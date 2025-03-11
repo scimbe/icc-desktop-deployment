@@ -1,6 +1,6 @@
 # debian XFCE Development Desktop auf der ICC
 
-Diese Dokumentation beschreibt, wie Sie einen debian XFCE Development Desktop in der Informatik Compute Cloud (ICC) der HAW Hamburg einrichten und verwenden können. Diese Umgebung enthält bereits vorinstallierte Entwicklungswerkzeuge wie Visual Studio Code, Sublime Text und Ansible.
+Diese Dokumentation beschreibt, wie Sie einen debian XFCE Development Desktop in der Informatik Compute Cloud (ICC) der HAW Hamburg verwenden können. Diese Umgebung enthält bereits vorinstallierte Entwicklungswerkzeuge wie Visual Studio Code, Sublime Text und Ansible.
 
 ## Inhaltsverzeichnis
 
@@ -14,6 +14,7 @@ Diese Dokumentation beschreibt, wie Sie einen debian XFCE Development Desktop in
 8. [Plattformübergreifender Zugriff](#plattformübergreifender-zugriff)
 9. [Tipps und Tricks](#tipps-und-tricks)
 10. [Fehlerbehebung](#fehlerbehebung)
+11. [Weiterführende Dokumentation](#weiterführende-dokumentation)
 
 ## Überblick
 
@@ -42,8 +43,8 @@ Diese Umgebung ist ideal für:
 
 ```bash
 # Repository klonen
-git clone <repository-url>
-cd icc-debian-desktop-deployment
+git clone https://github.com/yourusername/icc-ubuntu-desktop-deployment.git
+cd icc-ubuntu-desktop-deployment
 
 # Ausführungsberechtigungen setzen
 chmod +x deploy-webtop.sh
@@ -59,6 +60,12 @@ chmod +x scripts/*.sh
 Nach der Einrichtung können Sie über Ihren Browser auf den Desktop zugreifen:
 - http://localhost:3000 (HTTP)
 - https://localhost:3001 (HTTPS, selbstsigniertes Zertifikat)
+
+Alternativ können Sie auch das Management-Tool verwenden, das alle Funktionen in einer benutzerfreundlichen Oberfläche zusammenfasst:
+
+```bash
+./icc-desktop-manager.sh
+```
 
 ## Zugriffsmöglichkeiten
 
@@ -84,6 +91,8 @@ Für verbesserte Performance:
 - **macOS**: VNC Viewer, Royal TSX, Screen Sharing (integriert)
 - **Linux**: Remmina, Vinagre, TigerVNC
 
+Detaillierte Anweisungen zum VNC-Zugriff finden Sie in der [VNC-Zugriffsdokumentation](docs/VNC-ACCESS.md).
+
 ### 3. RDP Clients
 
 Für optimale Windows-Kompatibilität:
@@ -97,6 +106,8 @@ Dann verbinden mit:
 - **Windows**: Microsoft Remote Desktop (integriert)
 - **macOS**: Microsoft Remote Desktop (App Store)
 - **Linux**: Remmina, FreeRDP
+
+Detaillierte Anweisungen zum RDP-Zugriff finden Sie in der [RDP-Zugriffsdokumentation](docs/RDP-ACCESS.md).
 
 ### 4. NoMachine (optional, für beste Performance)
 
@@ -138,6 +149,8 @@ Der Development Desktop enthält folgende vorinstallierte Tools:
 - Build-Essential (GCC, G++, Make)
 - Python 3 mit Pip
 - Verschiedene Dienstprogramme (curl, wget, etc.)
+
+Empfehlungen für zusätzliche Entwicklungstools finden Sie in der [Entwicklungstools-Dokumentation](docs/DEVELOPMENT-TOOLS.md).
 
 ## Anpassungen und Erweiterungen
 
@@ -296,7 +309,11 @@ docker run hello-world
 
 ## Fehlerbehebung
 
-### Problem: Desktop startet nicht oder zeigt schwarzen Bildschirm
+Bei Problemen mit dem Development Desktop konsultieren Sie bitte zuerst die [Fehlerbehebungsanleitung](FEHLERBEHEBUNG.md), die detaillierte Lösungen für häufige Probleme bietet.
+
+### Häufige Probleme:
+
+#### Problem: Desktop startet nicht oder zeigt schwarzen Bildschirm
 
 **Lösung**:
 1. Überprüfen Sie den Pod-Status:
@@ -312,7 +329,7 @@ docker run hello-world
    kubectl -n $NAMESPACE delete pod $POD_NAME
    ```
 
-### Problem: Tools wie VS Code starten nicht
+#### Problem: Tools wie VS Code starten nicht
 
 **Lösung**:
 1. Installation über Terminal überprüfen:
@@ -326,7 +343,7 @@ docker run hello-world
    sudo apt install --reinstall code
    ```
 
-### Problem: Langsame Verbindung oder Lags
+#### Problem: Langsame Verbindung oder Lags
 
 **Lösung**:
 1. Reduzieren Sie die Auflösung in den Einstellungen
@@ -334,7 +351,7 @@ docker run hello-world
 3. Versuchen Sie, einen nativen Client (VNC/RDP) statt des Browsers zu verwenden
 4. Erhöhen Sie die Ressourcenlimits in der webtop-config.sh
 
-### Problem: Persistenter Speicher ist voll
+#### Problem: Persistenter Speicher ist voll
 
 **Lösung**:
 1. Speicherbelegung prüfen:
@@ -346,3 +363,18 @@ docker run hello-world
    du -sh /config/* | sort -hr
    ```
 3. In schweren Fällen: Vergrößern des PVC (erfordert Administrator-Eingriff)
+
+## Weiterführende Dokumentation
+
+Zusätzliche Dokumentation zu speziellen Themen finden Sie in folgenden Dateien:
+
+- [Installationsanleitung](INSTALLATION-ANLEITUNG.md) - Detaillierte Anleitung zur Installation
+- [Fehlerbehebung](FEHLERBEHEBUNG.md) - Umfassende Anleitung zur Problemlösung
+- [RDP-Zugriff](docs/RDP-ACCESS.md) - Detaillierte Anleitung zum Zugriff über RDP
+- [VNC-Zugriff](docs/VNC-ACCESS.md) - Detaillierte Anleitung zum Zugriff über VNC
+- [Entwicklungstools](docs/DEVELOPMENT-TOOLS.md) - Empfehlungen für zusätzliche Entwicklungstools
+- [Upgrade-Guide](docs/UPGRADE-GUIDE.md) - Anleitung zum Aktualisieren der Installation
+
+## Lizenz
+
+Dieses Projekt steht unter einer modifizierten MIT-Lizenz, die nur für akademische Zwecke frei nutzbar ist. Die Nutzung für kommerzielle Zwecke bedarf der ausdrücklichen Genehmigung der Urheberrechtsinhaber. Siehe die [LICENSE](LICENSE) Datei für Details.
