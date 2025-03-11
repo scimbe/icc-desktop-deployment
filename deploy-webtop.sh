@@ -47,7 +47,7 @@ if [ ! -f "$SCRIPT_DIR/configs/webtop-config.sh" ]; then
 fi
 
 # Setze Ausführungsberechtigungen für Skripte
-chmod +x "$SCRIPT_DIR/scripts/deploy-webtop.sh"
+chmod +x "$SCRIPT_DIR/scripts/deploy-webtop-icc.sh"
 chmod +x "$SCRIPT_DIR/scripts/port-forward-webtop.sh"
 chmod +x "$SCRIPT_DIR/scripts/setup-rdp.sh"
 
@@ -80,4 +80,4 @@ if [[ ! $REPLY =~ ^[Jj]$ ]]; then
 fi
 
 # Führe Deployment-Skript aus
-"$SCRIPT_DIR/scripts/deploy-webtop.sh"
+"$SCRIPT_DIR/scripts/deploy-webtop-icc.sh"
