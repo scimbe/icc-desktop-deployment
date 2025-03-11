@@ -65,14 +65,41 @@ log "Konfiguriere Benutzereinstellungen..."
 echo 'abc:abc' | chpasswd
 usermod -aG ssl-cert abc
 
-# Setze Berechtigungen für .Xauthority
-touch /home/abc/.Xauthority
-chown abc:abc /home/abc/.Xauthority
-chmod 600 /home/abc/.Xauthority
+# Stelle sicher, dass das Home-Verzeichnis existiert
+log "Überprüfe und erstelle das Home-Verzeichnis wenn nötig..."
+if [ ! -d "/home/abc" ]; then
+    log "Erstelle Home-Verzeichnis für Benutzer abc..."
+    mkdir -p /home/abc
+    chown abc:abc /home/abc
+    chmod 750 /home/abc
+fi
+
+# Prüfe ob das Home-Verzeichnis in /config/home/abc oder /home/abc ist
+if [ -d "/config/home/abc" ]; then
+    log "Webtop-Container verwendet /config/home/abc als Home-Verzeichnis"
+    
+    # Erstelle symlink für Home-Verzeichnis
+    if [ ! -L "/home/abc" ]; then
+        log "Erstelle Symlink von /home/abc zu /config/home/abc..."
+        rm -rf /home/abc
+        ln -s /config/home/abc /home/abc
+    fi
+    
+    # Setze Berechtigungen für .Xauthority im tatsächlichen Home-Verzeichnis
+    touch /config/home/abc/.Xauthority
+    chown abc:abc /config/home/abc/.Xauthority
+    chmod 600 /config/home/abc/.Xauthority
+else
+    # Setze Berechtigungen für .Xauthority
+    touch /home/abc/.Xauthority
+    chown abc:abc /home/abc/.Xauthority
+    chmod 600 /home/abc/.Xauthority
+fi
 
 # XFCE-Einstellungen für den Benutzer anpassen
-mkdir -p /home/abc/.config/xfce4/xfconf/xfce-perchannel-xml/
-cat > /home/abc/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml << 'XFCECONFIG'
+HOME_DIR=$(eval echo ~abc)
+mkdir -p ${HOME_DIR}/.config/xfce4/xfconf/xfce-perchannel-xml/
+cat > ${HOME_DIR}/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml << 'XFCECONFIG'
 <?xml version="1.0" encoding="UTF-8"?>
 <channel name="xfce4-session" version="1.0">
   <property name="general" type="empty">
@@ -104,7 +131,15 @@ cat > /home/abc/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml << 'X
 </channel>
 XFCECONFIG
 
-chown -R abc:abc /home/abc/.config
+# Erstelle .xsession Datei im Home-Verzeichnis
+cat > ${HOME_DIR}/.xsession << 'XSESSION'
+#!/bin/bash
+xfce4-session
+XSESSION
+chmod +x ${HOME_DIR}/.xsession
+
+# Setze Berechtigungen für alle Dateien im Home-Verzeichnis
+chown -R abc:abc ${HOME_DIR}
 
 # Passe Firewall an (falls ufw installiert ist)
 if command -v ufw >/dev/null 2>&1; then
@@ -130,7 +165,7 @@ echo "$INSTALL_SCRIPT" | kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c 
 
 # Skript im Pod ausführen
 echo "Führe Installationsskript im Pod aus..."
-kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "sudo /tmp/setup-rdp.sh"
+kubectl -n "$NAMESPACE" exec -it "$POD_NAME" -- bash -c "sudo /tmp/setup-rdp.sh"
 
 # Port-Forwarding für RDP einrichten
 echo "Richte Port-Forwarding für RDP ein..."
