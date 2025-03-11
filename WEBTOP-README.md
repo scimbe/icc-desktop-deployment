@@ -43,7 +43,7 @@ Diese Umgebung ist ideal für:
 ```bash
 # Repository klonen
 git clone <repository-url>
-cd icc-ollama-deployment
+cd icc-ubuntu-desktop-deployment
 
 # Ausführungsberechtigungen setzen
 chmod +x deploy-webtop.sh
