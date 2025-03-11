@@ -1,6 +1,6 @@
-# Ubuntu XFCE Development Desktop auf der ICC
+# debian XFCE Development Desktop auf der ICC
 
-Diese Dokumentation beschreibt, wie Sie einen Ubuntu XFCE Development Desktop in der Informatik Compute Cloud (ICC) der HAW Hamburg einrichten und verwenden können. Diese Umgebung enthält bereits vorinstallierte Entwicklungswerkzeuge wie Visual Studio Code, Sublime Text und Ansible.
+Diese Dokumentation beschreibt, wie Sie einen debian XFCE Development Desktop in der Informatik Compute Cloud (ICC) der HAW Hamburg einrichten und verwenden können. Diese Umgebung enthält bereits vorinstallierte Entwicklungswerkzeuge wie Visual Studio Code, Sublime Text und Ansible.
 
 ## Inhaltsverzeichnis
 
@@ -19,7 +19,7 @@ Diese Dokumentation beschreibt, wie Sie einen Ubuntu XFCE Development Desktop in
 
 Der ICC Development Desktop bietet:
 
-- Ubuntu Linux mit XFCE Desktop-Umgebung
+- debian Linux mit XFCE Desktop-Umgebung
 - Vorinstallierte Entwicklungstools (VS Code, Sublime Text, Ansible)
 - Persistenten Speicher für Ihre Projekte und Konfigurationen
 - Zugriff über verschiedene Clients (Browser, VNC, RDP) von Windows, macOS oder Linux
@@ -43,7 +43,7 @@ Diese Umgebung ist ideal für:
 ```bash
 # Repository klonen
 git clone <repository-url>
-cd icc-ubuntu-desktop-deployment
+cd icc-debian-desktop-deployment
 
 # Ausführungsberechtigungen setzen
 chmod +x deploy-webtop.sh

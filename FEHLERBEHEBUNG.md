@@ -1,6 +1,6 @@
-# Fehlerbehebung: Ubuntu XFCE Desktop auf der ICC
+# Fehlerbehebung: debian XFCE Desktop auf der ICC
 
-Diese Anleitung bietet Hilfestellung zur Lösung von Problemen, die bei der Installation und Nutzung des Ubuntu XFCE Desktops auf der ICC auftreten können.
+Diese Anleitung bietet Hilfestellung zur Lösung von Problemen, die bei der Installation und Nutzung des debian XFCE Desktops auf der ICC auftreten können.
 
 ## Segmentation Fault im VNC-Server
 
@@ -107,7 +107,7 @@ Wenn Sie nicht auf den Desktop zugreifen können, nachdem die Installation abges
 3. **Verbindungsdetails überprüfen**
    ```bash
    # Service-Details anzeigen
-   kubectl -n $NAMESPACE get service ubuntu-xfce -o wide
+   kubectl -n $NAMESPACE get service debian-xfce -o wide
    ```
 
 ## Probleme mit dem persistenten Speicher

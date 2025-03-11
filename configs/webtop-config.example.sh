@@ -5,8 +5,8 @@
 export NAMESPACE="wXYZ123-default"  # Ersetzen Sie dies mit Ihrem Namespace
 
 # Deployment-Namen
-export WEBTOP_DEPLOYMENT_NAME="ubuntu-xfce"
-export WEBTOP_SERVICE_NAME="ubuntu-xfce"
+export WEBTOP_DEPLOYMENT_NAME="debian-xfce"
+export WEBTOP_SERVICE_NAME="debian-xfce"
 
 # Ressourcenlimits
 export MEMORY_LIMIT="8Gi"  # 8GB RAM für Entwicklungsarbeit

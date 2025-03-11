@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Skript zum Deployment eines minimalistischen Ubuntu XFCE Desktops auf der ICC
+# Skript zum Deployment eines minimalistischen XFCE Desktops auf der ICC
 set -e
 
 # Pfad zum Skriptverzeichnis
@@ -36,7 +36,7 @@ if ! kubectl get namespace "$NAMESPACE" &> /dev/null; then
     exit 1
 fi
 
-echo -e "${GREEN}=== ICC Ubuntu XFCE Minimalistischer Desktop Deployment ===${NC}"
+echo -e "${GREEN}=== ICC  XFCE Minimalistischer Desktop Deployment ===${NC}"
 echo "Namespace: $NAMESPACE"
 echo "Ressourcen: $MEMORY_LIMIT RAM, $CPU_LIMIT CPU"
 echo "Persistenter Speicher: $STORAGE_SIZE"
@@ -98,7 +98,7 @@ kubectl apply -f "$DEPLOY_TMP_FILE"
 rm "$PVC_TMP_FILE" "$DEPLOY_TMP_FILE"
 
 # Warte auf das Deployment
-echo "Warte auf das Ubuntu XFCE Deployment..."
+echo "Warte auf das XFCE Deployment..."
 kubectl -n "$NAMESPACE" rollout status deployment/"$WEBTOP_DEPLOYMENT_NAME" --timeout=300s || {
     echo -e "\n${YELLOW}Timeout beim Warten auf das Deployment. Prüfe den Status...${NC}"
 }
@@ -116,7 +116,7 @@ if [ -n "$POD_NAME" ]; then
     # Prüfe, ob der Pod im Status "Running" ist
     POD_STATUS=$(kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o jsonpath='{.status.phase}')
     if [ "$POD_STATUS" = "Running" ]; then
-        echo -e "\n${GREEN}Ubuntu XFCE Minimalistischer Desktop erfolgreich bereitgestellt.${NC}"
+        echo -e "\n${GREEN}XFCE Minimalistischer Desktop erfolgreich bereitgestellt.${NC}"
     else
         echo -e "\n${YELLOW}Pod ist im Status '$POD_STATUS'. Mögliche Probleme:${NC}"
         kubectl -n "$NAMESPACE" describe pod "$POD_NAME"

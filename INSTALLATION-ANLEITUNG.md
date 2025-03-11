@@ -1,6 +1,6 @@
-# Installation des Ubuntu XFCE Development Desktop auf der ICC
+# Installation des debian XFCE Development Desktop auf der ICC
 
-Diese Anleitung hilft Ihnen bei der Installation des Ubuntu XFCE Development Desktops auf der Informatik Compute Cloud (ICC) der HAW Hamburg mit den korrigierten Deployment-Dateien.
+Diese Anleitung hilft Ihnen bei der Installation des debian XFCE Development Desktops auf der Informatik Compute Cloud (ICC) der HAW Hamburg mit den korrigierten Deployment-Dateien.
 
 ## Problemlösung - Paketinstallation
 

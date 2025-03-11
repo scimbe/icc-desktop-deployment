@@ -18,7 +18,7 @@ spec:
       securityContext:
         fsGroup: 1000
       containers:
-        - name: ubuntu-xfce
+        - name: debian-xfce
           image: lscr.io/linuxserver/webtop:debian-xfce
           securityContext:
             privileged: false

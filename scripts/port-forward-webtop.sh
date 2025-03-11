@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Skript zum Starten des Port-Forwardings für den Ubuntu XFCE Desktop
+# Skript zum Starten des Port-Forwardings für den debian XFCE Desktop
 set -e
 
 # Pfad zum Skriptverzeichnis
@@ -37,7 +37,7 @@ if [ "$POD_STATUS" != "Running" ]; then
 fi
 
 # Starte Port-Forwarding in separaten Prozessen
-echo "Starte Port-Forwarding für Ubuntu XFCE Desktop:"
+echo "Starte Port-Forwarding für debian XFCE Desktop:"
 echo "- HTTP auf Port 3000"
 kubectl -n "$NAMESPACE" port-forward svc/"$WEBTOP_SERVICE_NAME" 3000:3000 &
 HTTP_PID=$!

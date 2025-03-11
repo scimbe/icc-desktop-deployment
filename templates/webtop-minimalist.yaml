@@ -83,7 +83,7 @@ spec:
                     cat > /config/home/abc/Desktop/README-HAW.txt << EOL
                     # HAW Development Desktop - Kurzanleitung
                     
-                    Dies ist ein Ubuntu Linux mit XFCE Desktop für die Entwicklung.
+                    Dies ist ein debian Linux mit XFCE Desktop für die Entwicklung.
                     
                     ## Erste Schritte:
                     1. Öffne das Terminal mit Strg+Alt+T

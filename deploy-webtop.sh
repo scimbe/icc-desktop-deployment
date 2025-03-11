@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Hauptskript für das Deployment eines Ubuntu XFCE Desktops mit Entwicklungstools
+# Hauptskript für das Deployment eines debian XFCE Desktops mit Entwicklungstools
 set -e
 
 # Pfad zum Skriptverzeichnis
@@ -60,9 +60,9 @@ if ! kubectl cluster-info -n $CURRENT_NS  &> /dev/null; then
   exit 1
 fi
 
-echo "=== Ubuntu XFCE Desktop mit Entwicklungstools Deployment ==="
+echo "=== debian XFCE Desktop mit Entwicklungstools Deployment ==="
 echo "Dieser Prozess wird:"
-echo "1. Ein Ubuntu XFCE Desktop-System auf der ICC bereitstellen"
+echo "1. Ein debian XFCE Desktop-System auf der ICC bereitstellen"
 echo "2. Visual Studio Code, Sublime Text und Ansible installieren"
 echo "3. Persistenten Speicher für Ihre Daten konfigurieren"
 echo "4. Port-Forwarding für den Browser-Zugriff einrichten"

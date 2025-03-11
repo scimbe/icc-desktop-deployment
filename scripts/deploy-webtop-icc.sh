@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Skript zum Deployment von Ubuntu XFCE Desktop mit Entwicklungstools auf der ICC
+# Skript zum Deployment von debian XFCE Desktop mit Entwicklungstools auf der ICC
 # Angepasst an die ICC-Umgebung
 set -e
 
@@ -37,7 +37,7 @@ if ! kubectl get namespace "$NAMESPACE" &> /dev/null; then
     exit 1
 fi
 
-echo -e "${GREEN}=== ICC Ubuntu XFCE Desktop mit Entwicklungstools Deployment ===${NC}"
+echo -e "${GREEN}=== ICC debian XFCE Desktop mit Entwicklungstools Deployment ===${NC}"
 echo "Namespace: $NAMESPACE"
 echo "Ressourcen: $MEMORY_LIMIT RAM, $CPU_LIMIT CPU"
 echo "Persistenter Speicher: $STORAGE_SIZE"
@@ -103,7 +103,7 @@ kubectl apply -f "$DEPLOY_TMP_FILE"
 rm "$PVC_TMP_FILE" "$DEPLOY_TMP_FILE"
 
 # Warte auf das Deployment
-echo "Warte auf das Ubuntu XFCE Deployment..."
+echo "Warte auf das debian XFCE Deployment..."
 echo "Dies kann einige Minuten dauern, da die Installation von VS Code, Sublime Text und Ansible Zeit benötigt..."
 kubectl -n "$NAMESPACE" rollout status deployment/"$WEBTOP_DEPLOYMENT_NAME" --timeout=300s || {
     echo -e "\n${YELLOW}Timeout beim Warten auf das Deployment. Prüfe den Status...${NC}"
@@ -128,7 +128,7 @@ if [ -n "$POD_NAME" ]; then
     # Prüfe, ob der Pod im Status "Running" ist
     POD_STATUS=$(kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o jsonpath='{.status.phase}')
     if [ "$POD_STATUS" = "Running" ]; then
-        echo -e "\n${GREEN}Ubuntu XFCE Desktop mit Entwicklungstools erfolgreich bereitgestellt.${NC}"
+        echo -e "\n${GREEN}debian XFCE Desktop mit Entwicklungstools erfolgreich bereitgestellt.${NC}"
     else
         echo -e "\n${YELLOW}Pod ist im Status '$POD_STATUS'. Mögliche Probleme:${NC}"
         kubectl -n "$NAMESPACE" describe pod "$POD_NAME"

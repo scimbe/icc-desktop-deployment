@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Monitor-Skript für den Installationsprozess des Ubuntu XFCE Development Desktop
+# Monitor-Skript für den Installationsprozess des debian XFCE Development Desktop
 set -e
 
 # Pfad zum Skriptverzeichnis
@@ -30,7 +30,7 @@ if [ -z "$POD_NAME" ]; then
     exit 1
 fi
 
-echo -e "${GREEN}=== Überwache Installationsprozess für Ubuntu XFCE Desktop ===${NC}"
+echo -e "${GREEN}=== Überwache Installationsprozess für debian XFCE Desktop ===${NC}"
 echo "Pod: $POD_NAME"
 echo "Namespace: $NAMESPACE"
 echo
@@ -61,7 +61,7 @@ show_logs() {
 # Hauptüberwachungsschleife
 while true; do
     clear
-    echo -e "${GREEN}=== Ubuntu XFCE Desktop Installationsmonitor ===${NC}"
+    echo -e "${GREEN}=== debian XFCE Desktop Installationsmonitor ===${NC}"
     echo "Zeitstempel: $(date)"
     echo "Pod: $POD_NAME"
     echo "Namespace: $NAMESPACE"

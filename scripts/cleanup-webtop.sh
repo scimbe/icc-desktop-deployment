@@ -22,9 +22,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}=== Löschen aller Ubuntu XFCE Desktop Ressourcen ===${NC}"
+echo -e "${YELLOW}=== Löschen aller debian XFCE Desktop Ressourcen ===${NC}"
 echo "Namespace: $NAMESPACE"
-echo "Diese Aktion wird alle Ressourcen des Ubuntu XFCE Desktops löschen,"
+echo "Diese Aktion wird alle Ressourcen des debian XFCE Desktops löschen,"
 echo "einschließlich des persistenten Speichers und aller darin enthaltenen Daten!"
 echo
 
@@ -105,4 +105,4 @@ else
 fi
 
 echo -e "\n${GREEN}Bereinigung abgeschlossen.${NC}"
-echo "Alle Ressourcen des Ubuntu XFCE Desktops wurden gelöscht."
+echo "Alle Ressourcen des debian XFCE Desktops wurden gelöscht."
