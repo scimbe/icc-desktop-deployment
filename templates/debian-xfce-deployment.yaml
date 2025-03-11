@@ -43,7 +43,7 @@ spec:
             - name: DOCKER_MODS
               value: "linuxserver/mods:universal-package-install"
             - name: INSTALL_PACKAGES
-              value: "code sublime-text conky ansible git curl wget xdg-utils gnupg2 apt-transport-https software-properties-common build-essential python3-pip"
+              value: "code sublime-text ansible git curl wget xdg-utils gnupg2 apt-transport-https software-properties-common build-essential python3-pip"
             # Wenn Sie ein Passwort setzen wollen (empfohlen)
             - name: PASSWORD
               value: "$VNC_PASSWORD"
@@ -76,7 +76,7 @@ spec:
                     if ! dpkg -l ansible > /dev/null 2>&1; then
                       apt-get update && apt-get install -y software-properties-common
                       apt-add-repository --yes --update ppa:ansible/ansible
-                      apt-get install -y ansible
+                      apt-get install -y ansible 
                     fi
                     
                     # Erstelle Desktop-Shortcuts
