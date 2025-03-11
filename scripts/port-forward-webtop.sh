@@ -22,13 +22,15 @@ if ! kubectl -n "$NAMESPACE" get deployment "$WEBTOP_DEPLOYMENT_NAME" &> /dev/nu
     exit 1
 fi
 
-# Prüfe, ob ein Pod läuft
-POD_NAME=$(kubectl -n "$NAMESPACE" get pods -l app=webtop -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+
+echo -e  "Prüfe, ob ein Pod läuft"
+POD_NAME=$(kubectl -n "$NAMESPACE" get pods -l service=webtop -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
 if [ -z "$POD_NAME" ]; then
     echo "Fehler: Kein laufender Pod für das Webtop Deployment gefunden."
     exit 1
 fi
 
+echo -e "Check Status"
 POD_STATUS=$(kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o jsonpath='{.status.phase}')
 if [ "$POD_STATUS" != "Running" ]; then
     echo "Fehler: Pod ist nicht im Status 'Running', sondern im Status '$POD_STATUS'."
@@ -36,7 +38,7 @@ if [ "$POD_STATUS" != "Running" ]; then
     exit 1
 fi
 
-# Starte Port-Forwarding in separaten Prozessen
+echo -e "Starte Port-Forwarding in separaten Prozessen"
 echo "Starte Port-Forwarding für debian XFCE Desktop:"
 echo "- HTTP auf Port 3000"
 kubectl -n "$NAMESPACE" port-forward svc/"$WEBTOP_SERVICE_NAME" 3000:3000 &
