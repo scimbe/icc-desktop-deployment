@@ -2,15 +2,6 @@
 
 Diese Anleitung hilft Ihnen bei der Installation des debian XFCE Development Desktops auf der Informatik Compute Cloud (ICC) der HAW Hamburg mit den korrigierten Deployment-Dateien.
 
-## Problemlösung - Paketinstallation
-
-Die Hauptprobleme bei der ursprünglichen Installation waren:
-
-1. Die Paketinstallation mit `DOCKER_MODS` und `INSTALL_PACKAGES` funktionierte nicht zuverlässig
-2. Die Repositories für VS Code, Sublime Text und Ansible wurden nicht korrekt konfiguriert
-
-Diese Probleme wurden in den aktualisierten Deployment-Dateien behoben.
-
 ## Installation durchführen
 
 ### Vorbereitung
