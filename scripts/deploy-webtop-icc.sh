@@ -148,31 +148,6 @@ if ! command -v git &> /dev/null || ! command -v ansible &> /dev/null; then
     apt-get update
     apt-get install -y git ansible
 fi
-
-# Clone das Repository mit dem spezifischen Branch
-echo "Clone ansible-basic Repository (Branch: icc)..."
-if [ -d "ansible-basic" ]; then
-    echo "Repository existiert bereits, update wird durchgeführt..."
-    cd ansible-basic
-    git fetch
-    git checkout icc
-    git pull
-else
-    git clone -b icc https://github.com/scimbe/ansible-basic.git
-    cd ansible-basic
-fi
-
-# Erstelle localhost Inventar-Datei falls nicht vorhanden
-if [ ! -f "localhost" ]; then
-    echo "Erstelle localhost Inventar-Datei..."
-    echo "localhost ansible_connection=local" > localhost
-fi
-
-# Setze Berechtigungen
-cd ..
-chown -R abc:abc ansible-basic
-
-echo "Ansible-Repository wurde ausgecheckt."
 EOF
 )
         

@@ -5,6 +5,32 @@ set -e
 
 # Wechsle ins Home-Verzeichnis des Benutzers abc
 cd /config
+
+# Clone das Repository mit dem spezifischen Branch
+echo "Clone ansible-basic Repository (Branch: icc)..."
+if [ -d "ansible-basic" ]; then
+    echo "Repository existiert bereits, update wird durchgeführt..."
+    cd ansible-basic
+    git fetch
+    git checkout icc
+    git pull
+else
+    git clone -b icc https://github.com/scimbe/ansible-basic.git
+    cd ansible-basic
+fi
+
+# Erstelle localhost Inventar-Datei falls nicht vorhanden
+if [ ! -f "localhost" ]; then
+    echo "Erstelle localhost Inventar-Datei..."
+    echo "localhost ansible_connection=local" > localhost
+fi
+
+# Setze Berechtigungen
+cd ..
+chown -R abc:abc ansible-basic
+
+echo "Ansible-Repository wurde ausgecheckt."
+
 # Repository-Auswahl aus Umgebungsvariable
 echo -e "Repository-Auswahl aus Umgebungsvariable: $DESKTOP_INSTALLATION"
 REPO_CHOICE=${DESKTOP_INSTALLATION}
@@ -34,11 +60,6 @@ case "$REPO_CHOICE" in
         else
             git clone https://github.com/scimbe/VS_Pattern_By_KI.git
         fi
-        
-        # Installiere JDK für VS_Pattern
-        echo "Installiere default-jdk für VS_Pattern..."
-        apt-get update
-        apt-get install -y default-jdk
         ;;
         
     "VS_Script")
