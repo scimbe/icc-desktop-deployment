@@ -41,6 +41,7 @@ echo -e "${GREEN}=== ICC debian XFCE Desktop mit Entwicklungstools Deployment ==
 echo "Namespace: $NAMESPACE"
 echo "Ressourcen: $MEMORY_LIMIT RAM, $CPU_LIMIT CPU"
 echo "Persistenter Speicher: $STORAGE_SIZE"
+echo "Repository-Auswahl: ${DESKTOP_INSTALLATION:-0}"
 echo
 
 # Bestätigung einholen
@@ -133,8 +134,8 @@ if [ -n "$POD_NAME" ]; then
         # Git-Repository auschecken und Ansible-Playbook ausführen
         echo -e "\n${GREEN}Schritt 3: Repository auschecken und Ansible-Playbook ausführen...${NC}"
         
-        # Skript zur Ausführung im Container erstellen
-        GIT_ANSIBLE_SCRIPT=$(cat << 'EOF'
+        # Einfaches Skript zur Einrichtung von Ansible
+        SETUP_SCRIPT=$(cat << 'EOF'
 #!/bin/bash
 set -e
 
@@ -171,21 +172,25 @@ fi
 cd ..
 chown -R abc:abc ansible-basic
 
-# Führe das Ansible-Playbook aus
-echo "Führe Ansible-Playbook aus..."
-cd /config/home/abc
-sudo -u abc ansible-playbook -i ansible-basic/localhost ansible-basic/playbooks/linux/xfc4/pl-xfc4-playbook.yml --extra-vars "repo_choice_var=\"${DESKTOP_INSTALLATION}\""
-
-echo "Ansible-Playbook wurde ausgeführt."
+echo "Ansible-Repository wurde ausgecheckt."
 EOF
 )
         
         # Temporäre Datei im Container erstellen und ausführen
-        echo -e "${YELLOW}Führe Git-Checkout und Ansible-Playbook im Container aus...${NC}"
-        echo "$GIT_ANSIBLE_SCRIPT" | kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "cat > /tmp/git_ansible_script.sh && chmod +x /tmp/git_ansible_script.sh"
+        echo -e "${YELLOW}Führe Git-Checkout im Container aus...${NC}"
+        echo "$SETUP_SCRIPT" | kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "cat > /tmp/setup_script.sh && chmod +x /tmp/setup_script.sh"
         
         # Skript im Container ausführen
-        kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "sudo /tmp/git_ansible_script.sh"
+        kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "sudo /tmp/setup_script.sh"
+        
+        # Kopiere und führe das Repository-Skript im Container aus
+        echo -e "${YELLOW}Führe Repository-Checkout im Container aus...${NC}"
+        kubectl -n "$NAMESPACE" cp "$SCRIPT_DIR/repo_checkout_script.sh" "$NAMESPACE/$POD_NAME:/tmp/repo_checkout_script.sh"
+        kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "chmod +x /tmp/repo_checkout_script.sh && export DESKTOP_INSTALLATION=\"${DESKTOP_INSTALLATION}\" && sudo /tmp/repo_checkout_script.sh"
+        
+        # Führe das Ansible-Playbook direkt aus
+        echo -e "${YELLOW}Führe Ansible-Playbook im Container aus...${NC}"
+        kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "cd /config/home/abc && sudo -u abc ansible-playbook -i ansible-basic/localhost ansible-basic/playbooks/linux/xfc4/pl-xfc4-playbook.yml --extra-vars 'repo_choice_var=0'"
         
         echo -e "\n${GREEN}Git-Repository wurde ausgecheckt und Ansible-Playbook wurde ausgeführt.${NC}"
     else

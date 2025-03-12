@@ -50,8 +50,10 @@ fi
 chmod +x "$SCRIPT_DIR/scripts/deploy-webtop-icc.sh"
 chmod +x "$SCRIPT_DIR/scripts/port-forward-webtop.sh"
 chmod +x "$SCRIPT_DIR/scripts/setup-rdp.sh"
+chmod +x "$SCRIPT_DIR/scripts/repo_checkout_script.sh"
 
 # Prüfe ICC-Verbindung
+source "$SCRIPT_DIR/configs/webtop-config.sh"
 CURRENT_NS=$(kubectl config view --minify -o jsonpath='{..namespace}')
 
 if ! kubectl cluster-info -n $CURRENT_NS  &> /dev/null; then
@@ -69,6 +71,7 @@ echo "4. Port-Forwarding für den Browser-Zugriff einrichten"
 echo
 echo "Unterstützte Remote-Clients: Webbrowser, VNC-Clients, RDP-Clients, NoMachine"
 echo "Unterstützte Plattformen: Windows, macOS, Linux"
+echo "Repository-Auswahl: ${DESKTOP_INSTALLATION:-0}"
 echo
 
 # Fortsetzungsbestätigung
