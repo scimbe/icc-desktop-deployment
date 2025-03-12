@@ -4,8 +4,7 @@
 set -e
 
 # Wechsle ins Home-Verzeichnis des Benutzers abc
-cd /config/home/abc
-
+cd /config
 # Repository-Auswahl aus Umgebungsvariable
 REPO_CHOICE="${DESKTOP_INSTALLATION:-0}"
 
