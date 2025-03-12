@@ -76,7 +76,8 @@ case "$REPO_CHOICE" in
         else
             git clone https://github.com/scimbe/vs_script.git
         fi
-        
+        ;;
+
     *)
         echo "Ungültige Repository-Auswahl: $REPO_CHOICE"
         echo "Gültige Optionen sind: 0, VS_Pattern, VS_Script, Alles"
