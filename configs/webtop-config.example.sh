@@ -16,10 +16,10 @@ export CPU_LIMIT="2000m"   # 4 CPU-Kerne
 export VNC_PASSWORD="haw-password"  # Bitte ändern Sie dies in ein sicheres Passwort
 
 # Persistenter Speicher einrichten
-export ENABLE_PERSISTENCE=true
+export ENABLE_PERSISTENCE=false
 export STORAGE_SIZE="10Gi"  # max 10GB für Entwicklungsprojekte
 
-# 0             - Keine Repositories auschecken"
+# Nichts         - Keine Repositories auschecken"
 # VS_Pattern    - Nur das VS_Pattern Repository auschecken"
 # VS_Script     - Nur das VS_Script Repository auschecken"
 # Alles         - Beide Repositories auschecken"
