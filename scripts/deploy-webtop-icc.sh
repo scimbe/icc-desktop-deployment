@@ -174,7 +174,7 @@ chown -R abc:abc ansible-basic
 # Führe das Ansible-Playbook aus
 echo "Führe Ansible-Playbook aus..."
 cd /config/home/abc
-sudo -u abc ansible-playbook -i ansible-basic/localhost ansible-basic/playbooks/linux/xfc4/pl-xfc4-playbook.yml
+sudo -u abc ansible-playbook -i ansible-basic/localhost ansible-basic/playbooks/linux/xfc4/pl-xfc4-playbook.yml --extra-vars "repo_choice_var=${DESKTOP_INSTALLATION}"
 
 echo "Ansible-Playbook wurde ausgeführt."
 EOF

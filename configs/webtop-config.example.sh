@@ -9,8 +9,8 @@ export WEBTOP_DEPLOYMENT_NAME="debian-xfce"
 export WEBTOP_SERVICE_NAME="debian-xfce"
 
 # Ressourcenlimits
-export MEMORY_LIMIT="8Gi"  # 8GB RAM für Entwicklungsarbeit
-export CPU_LIMIT="4000m"   # 4 CPU-Kerne
+export MEMORY_LIMIT="2Gi"  # 8GB RAM für Entwicklungsarbeit
+export CPU_LIMIT="2000m"   # 4 CPU-Kerne
 
 # VNC-Passwort (für sicheren Zugriff)
 export VNC_PASSWORD="haw-password"  # Bitte ändern Sie dies in ein sicheres Passwort
@@ -18,3 +18,9 @@ export VNC_PASSWORD="haw-password"  # Bitte ändern Sie dies in ein sicheres Pas
 # Persistenter Speicher einrichten
 export ENABLE_PERSISTENCE=true
 export STORAGE_SIZE="10Gi"  # max 10GB für Entwicklungsprojekte
+
+0             - Keine Repositories auschecken"
+VS_Pattern    - Nur das VS_Pattern Repository auschecken"
+VS_Script     - Nur das VS_Script Repository auschecken"
+Alles         - Beide Repositories auschecken"
+export VERSION="VS_Pattern"
