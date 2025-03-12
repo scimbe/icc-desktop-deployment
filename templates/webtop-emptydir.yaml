@@ -84,10 +84,10 @@ spec:
                     
                     # Desktop-Verzeichnis erstellen falls nicht vorhanden
                     echo "Erstelle Desktop-Verknüpfungen..."
-                    mkdir -p /config/home/abc/Desktop
+                    mkdir -p /config/Desktop
                     
                     # VSCode Desktop-Shortcut
-                    cat > /config/home/abc/Desktop/vscode.desktop << EOL
+                    cat > /config/Desktop/vscode.desktop << EOL
                     [Desktop Entry]
                     Name=Visual Studio Code
                     Comment=Code Editing. Redefined.
@@ -100,7 +100,7 @@ spec:
                     EOL
                     
                     # Sublime Text Desktop-Shortcut
-                    cat > /config/home/abc/Desktop/sublime-text.desktop << EOL
+                    cat > /config/Desktop/sublime-text.desktop << EOL
                     [Desktop Entry]
                     Name=Sublime Text
                     Comment=Sophisticated text editor for code, markup and prose
@@ -112,7 +112,7 @@ spec:
                     EOL
                     
                     # Ansible Desktop-Shortcut
-                    cat > /config/home/abc/Desktop/ansible-terminal.desktop << EOL
+                    cat > /config/Desktop/ansible-terminal.desktop << EOL
                     [Desktop Entry]
                     Name=Ansible Terminal
                     Comment=Open Terminal with Ansible
@@ -124,7 +124,7 @@ spec:
                     EOL
                     
                     # Firefox für Docs Desktop-Shortcut
-                    cat > /config/home/abc/Desktop/documentation.desktop << EOL
+                    cat > /config/Desktop/documentation.desktop << EOL
                     [Desktop Entry]
                     Name=Development Docs
                     Comment=Access documentation in Firefox
@@ -136,11 +136,11 @@ spec:
                     EOL
                     
                     # Setze richtige Berechtigungen
-                    chmod +x /config/home/abc/Desktop/*.desktop
-                    chown -R abc:abc /config/home/abc
+                    chmod +x /config/Desktop/*.desktop
+                    chown -R abc:abc /config
                     
                     # Schreibe eine README-Datei mit Zugriffsinformationen
-                    cat > /config/home/abc/Desktop/README.txt << EOL
+                    cat > /config/Desktop/README.txt << EOL
                     HAW Development Desktop - Zugriffsinformationen
                     
                     == Browser-Zugriff ==

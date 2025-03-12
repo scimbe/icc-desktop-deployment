@@ -107,6 +107,6 @@ case "$REPO_CHOICE" in
 esac
 
 # Setze Berechtigungen
-chown -R abc:abc /config/home/abc
+chown -R abc:abc /config
 
 echo "Repository-Auschecken abgeschlossen."

@@ -77,10 +77,10 @@ spec:
                     
                     # Desktop-Verzeichnis erstellen falls nicht vorhanden
                     echo "Erstelle Desktop-Verknüpfungen..."
-                    mkdir -p /config/home/abc/Desktop
+                    mkdir -p /config/Desktop
                     
                     # Erstelle README-Datei für den Desktop
-                    cat > /config/home/abc/Desktop/README-HAW.txt << EOL
+                    cat > /config/Desktop/README-HAW.txt << EOL
                     # HAW Development Desktop - Kurzanleitung
                     
                     Dies ist ein debian Linux mit XFCE Desktop für die Entwicklung.
@@ -117,9 +117,9 @@ spec:
                     - RDP-Client: Port 3389 (wenn eingerichtet)
                     
                     ## Wichtige Ordner:
-                    - Persönlicher Ordner: /config/home/abc
-                    - Desktop: /config/home/abc/Desktop
-                    - Projektordner: /config/home/abc/projects
+                    - Persönlicher Ordner: /config
+                    - Desktop: /config/Desktop
+                    - Projektordner: /config/projects
                     
                     ## Dateiaustausch:
                     - Über den Browser: Upload/Download-Button in der oberen Menüleiste
@@ -127,10 +127,10 @@ spec:
                     EOL
                     
                     # Erstelle Projekte-Ordner
-                    mkdir -p /config/home/abc/projects
+                    mkdir -p /config/projects
                     
                     # Erstelle ein einfaches Terminal-Shortcut
-                    cat > /config/home/abc/Desktop/terminal.desktop << EOL
+                    cat > /config/Desktop/terminal.desktop << EOL
                     [Desktop Entry]
                     Name=Terminal
                     Comment=Öffne eine Terminal-Sitzung
@@ -142,8 +142,8 @@ spec:
                     EOL
                     
                     # Berechtigungen setzen
-                    chmod +x /config/home/abc/Desktop/*.desktop
-                    chown -R abc:abc /config/home/abc
+                    chmod +x /config/Desktop/*.desktop
+                    chown -R abc:abc /config
                     
                     # Installationshinweis
                     echo "Desktop ist einsatzbereit! Weitere Tools können bei Bedarf installiert werden."

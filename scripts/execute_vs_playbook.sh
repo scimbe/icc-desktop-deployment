@@ -77,6 +77,6 @@ kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "chmod +x /tmp/repo_check
 
 # Führe das Ansible-Playbook direkt aus
 echo -e "${YELLOW}Führe Ansible-Playbook im Container aus...${NC}"
-kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "cd /config/home/abc && sudo -u abc ansible-playbook -i ansible-basic/localhost ansible-basic/playbooks/linux/xfc4/pl-xfc4-playbook.yml --extra-vars \"repo_choice_var=0\""
+kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "cd /config && sudo -u abc ansible-playbook -i ansible-basic/localhost ansible-basic/playbooks/linux/xfc4/pl-xfc4-playbook.yml --extra-vars \"repo_choice_var=0\""
 
 echo -e "\n${GREEN}Git-Repository wurde ausgecheckt und Ansible-Playbook wurde ausgeführt.${NC}"

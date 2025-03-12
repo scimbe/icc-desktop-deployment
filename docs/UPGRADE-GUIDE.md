@@ -46,8 +46,8 @@ Verbinden Sie sich mit dem Desktop und exportieren Sie wichtige Dateien:
    POD_NAME=$(kubectl -n $NAMESPACE get pods -l service=webtop -o jsonpath='{.items[0].metadata.name}')
    
    # Wichtige Daten kopieren
-   kubectl -n $NAMESPACE cp $POD_NAME:/config/home/abc/projects/ ./backup-projects/
-   kubectl -n $NAMESPACE cp $POD_NAME:/config/home/abc/.config/ ./backup-config/
+   kubectl -n $NAMESPACE cp $POD_NAME:/config/projects/ ./backup-projects/
+   kubectl -n $NAMESPACE cp $POD_NAME:/config/.config/ ./backup-config/
    ```
 
 ## Upgrade durchführen
@@ -132,18 +132,18 @@ Für spezifische Anwendungsdaten:
 
 1. **VS Code Settings**:
    ```bash
-   kubectl -n $NAMESPACE cp ./backup-config/Code $POD_NAME:/config/home/abc/.config/Code
+   kubectl -n $NAMESPACE cp ./backup-config/Code $POD_NAME:/config/.config/Code
    ```
 
 2. **Sublime Text Settings**:
    ```bash
-   kubectl -n $NAMESPACE cp ./backup-config/sublime-text-3 $POD_NAME:/config/home/abc/.config/sublime-text-3
+   kubectl -n $NAMESPACE cp ./backup-config/sublime-text-3 $POD_NAME:/config/.config/sublime-text-3
    ```
 
 3. **SSH-Schlüssel und Git-Konfiguration**:
    ```bash
-   kubectl -n $NAMESPACE cp ./backup-home/.ssh $POD_NAME:/config/home/abc/.ssh
-   kubectl -n $NAMESPACE cp ./backup-home/.gitconfig $POD_NAME:/config/home/abc/.gitconfig
+   kubectl -n $NAMESPACE cp ./backup-home/.ssh $POD_NAME:/config/.ssh
+   kubectl -n $NAMESPACE cp ./backup-home/.gitconfig $POD_NAME:/config/.gitconfig
    ```
 
 ## Problembehebung
@@ -165,7 +165,7 @@ kubectl -n $NAMESPACE delete pod $POD_NAME
 
 ```bash
 # Berechtigungen korrigieren
-kubectl -n $NAMESPACE exec -it $POD_NAME -- bash -c "chown -R abc:abc /config/home/abc"
+kubectl -n $NAMESPACE exec -it $POD_NAME -- bash -c "chown -R abc:abc /config"
 ```
 
 ### PVC kann nicht gelöscht werden (PVC protection)

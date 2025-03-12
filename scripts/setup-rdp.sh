@@ -102,24 +102,24 @@ debug_log "Benutzerkonten nach Einrichtung:"
 debug_log "$(cat /etc/passwd | grep abc)"
 debug_log "$(cat /etc/shadow | grep abc)"
 
-# Prüfe ob das Home-Verzeichnis in /config/home/abc oder /home/abc ist
-if [ -d "/config/home/abc" ]; then
-    log "Webtop-Container verwendet /config/home/abc als Home-Verzeichnis"
-    debug_log "Webtop-Container verwendet /config/home/abc als Home-Verzeichnis"
+# Prüfe ob das Home-Verzeichnis in /config/  oder /home/abc ist
+if [ -d "/config/" ]; then
+    log "Webtop-Container verwendet /config/ c als Home-Verzeichnis"
+    debug_log "Webtop-Container verwendet /config/  als Home-Verzeichnis"
     
     # Erstelle symlink für Home-Verzeichnis
     if [ ! -L "/home/abc" ]; then
-        log "Erstelle Symlink von /home/abc zu /config/home/abc..."
+        log "Erstelle Symlink von /home/abc zu /config..."
         rm -rf /home/abc
-        ln -s /config/home/abc /home/abc
+        ln -s /config /home/abc
     fi
     
     # Setze Berechtigungen für .Xauthority im tatsächlichen Home-Verzeichnis
-    touch /config/home/abc/.Xauthority
-    chown abc:abc /config/home/abc/.Xauthority
-    chmod 600 /config/home/abc/.Xauthority
+    touch /config/.Xauthority
+    chown abc:abc /config/.Xauthority
+    chmod 600 /config/.Xauthority
     
-    HOME_DIR="/config/home/abc"
+    HOME_DIR="/config/"
 else
     # Setze Berechtigungen für .Xauthority
     touch /home/abc/.Xauthority
@@ -294,7 +294,7 @@ echo "Führe Installationsskript im Pod aus..."
 kubectl -n "$NAMESPACE" exec -it "$POD_NAME" -- bash -c "sudo /tmp/setup-rdp.sh"
 
 # Holen des festgelegten RDP-Passworts aus dem Pod
-RDP_CRED=$(kubectl -n "$NAMESPACE" exec -it "$POD_NAME" -- cat /config/home/abc/Desktop/RDP-CREDENTIALS.txt | grep PASSWORT | awk '{print $2}')
+RDP_CRED=$(kubectl -n "$NAMESPACE" exec -it "$POD_NAME" -- cat /config/Desktop/RDP-CREDENTIALS.txt | grep PASSWORT | awk '{print $2}')
 
 # Port-Forwarding für RDP einrichten
 echo "Richte Port-Forwarding für RDP ein..."
