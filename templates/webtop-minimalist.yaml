@@ -170,6 +170,10 @@ spec:
       port: 3001
       protocol: TCP
       targetPort: 3001
+    - name: vnc
+      port: 5900
+      protocol: TCP
+      targetPort: 5900
   selector:
     service: webtop
   type: ClusterIP
