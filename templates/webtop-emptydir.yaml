@@ -28,6 +28,9 @@ spec:
               name: http
             - containerPort: 3001
               name: https
+            - containerPort: 5900
+              name: vnc
+
           env:
             - name: PUID
               value: "1000"
@@ -199,7 +202,7 @@ spec:
     - name: vnc
       port: 5900
       protocol: TCP
-      targetPort: 5900
+      targetPort: 6901
   selector:
     app: webtop
   type: ClusterIP

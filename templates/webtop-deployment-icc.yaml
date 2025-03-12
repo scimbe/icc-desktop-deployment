@@ -39,6 +39,8 @@ spec:
               protocol: TCP
             - containerPort: 3001
               name: https
+            - containerPort: 5900
+              name: vnc
               protocol: TCP
           resources:
             limits:
@@ -157,7 +159,7 @@ spec:
     - name: vnc
       port: 5900
       protocol: TCP
-      targetPort: 5900
+      targetPort: 6901
   selector:
     service: webtop
   type: ClusterIP
