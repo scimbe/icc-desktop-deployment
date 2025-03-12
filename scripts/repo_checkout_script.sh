@@ -10,7 +10,7 @@ REPO_CHOICE="${DESKTOP_INSTALLATION:-0}"
 
 # Wenn die Wahl leer ist, Standard auf "0" setzen
 if [ -z "$REPO_CHOICE" ]; then
-    REPO_CHOICE="0"
+    REPO_CHOICE="Nichts"
     echo "Keine Repository-Auswahl angegeben, verwende Standard-Option: $REPO_CHOICE"
 fi
 
@@ -18,7 +18,7 @@ echo "Repository-Auswahl: $REPO_CHOICE"
 
 # Behandlung der verschiedenen Optionen
 case "$REPO_CHOICE" in
-    "0")
+    "Nichts")
         echo "Keine Repositories werden ausgecheckt."
         ;;
         
@@ -79,7 +79,7 @@ case "$REPO_CHOICE" in
 
     *)
         echo "Ungültige Repository-Auswahl: $REPO_CHOICE"
-        echo "Gültige Optionen sind: 0, VS_Pattern, VS_Script, Alles"
+        echo "Gültige Optionen sind: Nichts, VS_Pattern, VS_Script, Alles"
         exit 1
         ;;
 esac
