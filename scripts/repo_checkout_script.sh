@@ -6,9 +6,10 @@ set -e
 # Wechsle ins Home-Verzeichnis des Benutzers abc
 cd /config
 # Repository-Auswahl aus Umgebungsvariable
+echo -e "Repository-Auswahl aus Umgebungsvariable: $DESKTOP_INSTALLATION"
 REPO_CHOICE=${DESKTOP_INSTALLATION}
 
-# Wenn die Wahl leer ist, Standard auf "0" setzen
+# Wenn die Wahl leer ist, Standard auf "Nichts" setzen
 if [ -z "$REPO_CHOICE" ]; then
     REPO_CHOICE="Nichts"
     echo "Keine Repository-Auswahl angegeben, verwende Standard-Option: $REPO_CHOICE"
