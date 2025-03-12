@@ -19,8 +19,8 @@ export VNC_PASSWORD="haw-password"  # Bitte ändern Sie dies in ein sicheres Pas
 export ENABLE_PERSISTENCE=true
 export STORAGE_SIZE="10Gi"  # max 10GB für Entwicklungsprojekte
 
-0             - Keine Repositories auschecken"
-VS_Pattern    - Nur das VS_Pattern Repository auschecken"
-VS_Script     - Nur das VS_Script Repository auschecken"
-Alles         - Beide Repositories auschecken"
-export VERSION="VS_Pattern"
+# 0             - Keine Repositories auschecken"
+# VS_Pattern    - Nur das VS_Pattern Repository auschecken"
+# VS_Script     - Nur das VS_Script Repository auschecken"
+# Alles         - Beide Repositories auschecken"
+export DESKTOP_INSTALLATION="VS_Pattern"
