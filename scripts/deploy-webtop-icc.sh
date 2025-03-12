@@ -186,7 +186,8 @@ EOF
         # Kopiere und führe das Repository-Skript im Container aus
         echo -e "${YELLOW}Führe Repository-Checkout im Container aus...${NC}  .... ${DESKTOP_INSTALLATION}"
         kubectl -n "$NAMESPACE" cp "$SCRIPT_DIR/repo_checkout_script.sh" "$NAMESPACE/$POD_NAME:/tmp/repo_checkout_script.sh"
-        kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "chmod +x /tmp/repo_checkout_script.sh && export DESKTOP_INSTALLATION=\"${DESKTOP_INSTALLATION}\" && sudo /tmp/repo_checkout_script.sh"
+        # FIX: Verwende sudo -E, um Umgebungsvariablen zu erhalten
+        kubectl -n "$NAMESPACE" exec -i "$POD_NAME" -- bash -c "chmod +x /tmp/repo_checkout_script.sh && export DESKTOP_INSTALLATION=\"${DESKTOP_INSTALLATION}\" && sudo -E /tmp/repo_checkout_script.sh"
         
         # Führe das Ansible-Playbook direkt aus
         echo -e "${YELLOW}Führe Ansible-Playbook im Container aus...${NC}"
